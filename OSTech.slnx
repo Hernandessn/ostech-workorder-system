@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="OSTech.Console/OSTech.Console.csproj" />
+  <Project Path="OSTech.Domain/OSTech.Domain.csproj" />
+  <Project Path="OSTech.EFCore/OSTech.EFCore.csproj" />
+</Solution>
