@@ -11,6 +11,10 @@ namespace OSTech.EFCore.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkOrder> builder)
         {
+            builder.HasOne(n => n.Technician)
+                   .WithMany(n => n.WorkOrders)
+                   .HasForeignKey(n => n.TechnicianId);
+
             builder.Property(n => n.Client)
                    .HasMaxLength(100)
                    .IsRequired();
