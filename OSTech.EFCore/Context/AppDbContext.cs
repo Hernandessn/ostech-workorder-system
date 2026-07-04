@@ -8,6 +8,10 @@ namespace OSTech.EFCore.Context
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext()
+        {
+        }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Technician> Technicians { get; set; }
         public DbSet<WorkOrder> WorkOrders { get; set; }

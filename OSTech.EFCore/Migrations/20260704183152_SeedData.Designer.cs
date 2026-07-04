@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OSTech.EFCore.Context;
 
@@ -11,9 +12,11 @@ using OSTech.EFCore.Context;
 namespace OSTech.EFCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260704183152_SeedData")]
+    partial class SeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace OSTech.EFCore.Migrations
 
                     b.HasKey("TechnicianId");
 
-                    b.ToTable("Technicians", (string)null);
+                    b.ToTable("Technicians");
 
                     b.HasData(
                         new
@@ -145,7 +148,7 @@ namespace OSTech.EFCore.Migrations
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("WorkOrders", (string)null);
+                    b.ToTable("WorkOrders");
 
                     b.HasData(
                         new
