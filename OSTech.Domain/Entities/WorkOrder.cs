@@ -9,7 +9,6 @@ namespace OSTech.Domain.Entities
     public class WorkOrder
     {
         public int WorkOrderId { get; private set; }
-        public string Client { get; private set; }
         public string Description { get; private set; }
         public string Title { get; private set; }
         public decimal Amount { get; private set; }
@@ -18,7 +17,12 @@ namespace OSTech.Domain.Entities
         public StatusWorkOrder Status { get; private set; }
         public int TechnicianId { get; private set; } // FK
         public Technician? Technician { get; private set; }
-
+        public int CustomerId { get; private set; }
+        public Customer? Customer { get; private set; }
+        public int CategoryId { get; private set; }
+        public Category? Category { get; private set; }
+        public int EquipmentId { get; private set; }
+        public Equipment? Equipment { get; private set; }
         private WorkOrder()
         {
 
@@ -34,7 +38,6 @@ namespace OSTech.Domain.Entities
             int technicianId
             )
         {
-            SetClient(client);
             SetDescription(description);
             SetTitle(title);
             SetAmount(amount);
@@ -68,14 +71,6 @@ namespace OSTech.Domain.Entities
                 throw new DomainException("Descrição inválida.");
             }
             Description = description;
-        }
-        public void SetClient(string client)
-        {
-            if (string.IsNullOrWhiteSpace(client))
-            {
-                throw new DomainException("Cliente inválido.");
-            }
-            Client = client;
         }
         public void SetTitle(string title)
         {

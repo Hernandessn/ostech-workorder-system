@@ -23,16 +23,16 @@ namespace OSTech.EFCore.Configurations
                    .IsRequired();
 
             builder.HasData(
-            new Technician
+            new 
             {
                 TechnicianId = 1,
-                Name = "Marcelão Alterado",
+                Name = "Marcelo Silva",
                 Specialty = "Engenharia de Software",
                 Contact = "11-2222-2222",
                 Availability = true,
                 HiringDate = DateOnly.Parse("2023-02-11")
             },
-            new Technician
+            new 
             {
                 TechnicianId = 2,
                 Name = "Ana Costa",
@@ -41,7 +41,7 @@ namespace OSTech.EFCore.Configurations
                 Availability = true,
                 HiringDate = DateOnly.Parse("2022-06-05")
             },
-            new Technician
+            new 
             {
                 TechnicianId = 3,
                 Name = "Bruno Almeida",
@@ -50,7 +50,7 @@ namespace OSTech.EFCore.Configurations
                 Availability = false,
                 HiringDate = DateOnly.Parse("2021-09-20")
             },
-            new Technician
+            new 
             {
                 TechnicianId = 4,
                 Name = "Juliana Ferreira",
@@ -59,7 +59,7 @@ namespace OSTech.EFCore.Configurations
                 Availability = true,
                 HiringDate = DateOnly.Parse("2024-01-10")
             },
-            new Technician
+            new 
             {
                 TechnicianId = 5,
                 Name = "Ricardo Mendes",
