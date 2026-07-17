@@ -27,26 +27,30 @@ namespace OSTech.Domain.Entities
         {
 
         }
-        public WorkOrder
-        (
-            string client,
+        public WorkOrder(
             string description,
             string title,
             decimal amount,
             DateOnly deadline,
             DateOnly openingDate,
-            int technicianId
-            )
+            int technicianId,
+            int customerId,
+            int categoryId,
+            int equipmentId)
         {
             SetDescription(description);
             SetTitle(title);
             SetAmount(amount);
 
             OpeningDate = openingDate;
-
             Status = StatusWorkOrder.Open;
-            ChangeDeadline(deadline); 
+
+            ChangeDeadline(deadline);
+
             AssignTechnician(technicianId);
+            AssignCustomer(customerId);
+            AssignCategory(categoryId);
+            AssignEquipment(equipmentId);
         }
         public void AssignTechnician(int technicianId)
         {
@@ -55,6 +59,30 @@ namespace OSTech.Domain.Entities
                 throw new DomainException("Técnico inválido.");
             }
             TechnicianId = technicianId;
+        }
+        public void AssignCustomer(int customerId)
+        {
+            if (customerId <= 0)
+            {
+                throw new DomainException("Customer inválido.");
+            }
+            CustomerId = customerId;
+        }
+        public void AssignCategory(int categoryId)
+        {
+            if (categoryId <= 0)
+            {
+                throw new DomainException("Categoria inválida.");
+            }
+            CategoryId = categoryId;
+        }
+        public void AssignEquipment(int equipmentId)
+        {
+            if (equipmentId <= 0)
+            {
+                throw new DomainException("Equipamento inválido.");
+            }
+            EquipmentId = equipmentId;
         }
         public void ChangeDeadline(DateOnly deadline)
         {

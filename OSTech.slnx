@@ -2,4 +2,5 @@
   <Project Path="OSTech.Console/OSTech.Console.csproj" />
   <Project Path="OSTech.Domain/OSTech.Domain.csproj" />
   <Project Path="OSTech.EFCore/OSTech.EFCore.csproj" />
+  <Project Path="OSTech.WebAPI/OSTech.WebAPI.csproj" Id="76fc58ae-5ed3-498d-8f54-329d0d77acaf" />
 </Solution>
