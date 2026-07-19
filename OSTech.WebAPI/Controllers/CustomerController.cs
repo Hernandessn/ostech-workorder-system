@@ -9,158 +9,138 @@ namespace OSTech.WebAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class CustomerController : Controller
+    public class CustomerController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public CustomerController(AppDbContext context)
+        private readonly ILogger<CustomerController> _logger;
+        public CustomerController(AppDbContext context, ILogger<CustomerController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CustomerDTO>> Get()
+        public async Task<ActionResult<IEnumerable<CustomerDTO>>> Get()
         {
-            try
-            {
-                var customers = _context.Customers
-                                         .AsNoTracking()
-                                         .Select(t => new CustomerDTO
-                                         {
-                                             CustomerId = t.CustomerId,
-                                             Name = t.Name,
-                                             Email = t.Email,
-                                             Phone = t.Phone,
-                                             Document = t.Document
-                                         })
-                                         .ToList();
-                return Ok(customers);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                           "An issue occurred while processing your request.");
-            }
+            var customers = await _context.Customers
+                                     .AsNoTracking()
+                                     .Select(t => new CustomerDTO
+                                     {
+                                         CustomerId = t.CustomerId,
+                                         Name = t.Name,
+                                         Email = t.Email,
+                                         Phone = t.Phone,
+                                         Document = t.Document
+                                     })
+                                     .ToListAsync();
+            return Ok(customers);
         }
 
-        [HttpGet("{id:int}", Name = "GetCustomers")]
-        public ActionResult<WorkOrderDTO> Get(int id)
+        [HttpGet("{id:int:min(1)}", Name = "GetCustomers")]
+        public async Task<ActionResult<CustomerDTO>> Get(int id)
         {
-            try
+            var customer = await _context.Customers
+                                     .AsNoTracking()
+                                     .FirstOrDefaultAsync(t => t.CustomerId == id);
+
+            if (customer is null)
             {
-                var customer = _context.Customers
-                                         .AsNoTracking()
-                                         .FirstOrDefault(t => t.CustomerId == id);
-
-                if (customer is null)
-                    return NotFound();
-
-                var dto = new CustomerDTO
-                {
-                    CustomerId = customer.CustomerId,
-                    Name = customer.Name,
-                    Email = customer.Email,
-                    Phone = customer.Phone,
-                    Document = customer.Document
-                };
-
-                return Ok(dto);
+                _logger.LogWarning($"Customer with id= {id} not found...");
+                return NotFound("Customer not found.");
             }
-            catch (Exception)
+
+            var dto = new CustomerDTO
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Phone = customer.Phone,
+                Document = customer.Document
+            };
+
+            return Ok(dto);
         }
         [HttpPost]
-        public ActionResult<CustomerDTO> Post(CreateCustomerDTO dto)
+        public async Task<ActionResult<CustomerDTO>> Post(CreateCustomerDTO dto)
         {
-            try
+            var customer = new Customer(
+                dto.Name,
+                dto.Email,
+                dto.Phone,
+                dto.Document
+            );
+
+            if (customer is null)
             {
-                var customer = new Customer(
-                    dto.Name,
-                    dto.Email,
-                    dto.Phone,
-                    dto.Document
-                );
-
-                _context.Customers.Add(customer);
-                _context.SaveChanges();
-
-                var customerDTO = new CustomerDTO
-                {
-                    CustomerId = customer.CustomerId,
-                    Name = customer.Name,
-                    Email = customer.Email,
-                    Phone = customer.Phone,
-                    Document = customer.Document
-                };
-
-                return CreatedAtRoute(
-                    "GetWorkOrder",
-                    new { id = customer.CustomerId },
-                    customerDTO);
+                _logger.LogWarning($"Invalid data...");
+                return BadRequest("Invalid data");
             }
-            catch (Exception)
+
+            await _context.Customers.AddAsync(customer);
+            await _context.SaveChangesAsync();
+
+            var customerDTO = new CustomerDTO
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Phone = customer.Phone,
+                Document = customer.Document
+            };
+
+            return CreatedAtRoute(
+                "GetCustomers",
+                new { id = customer.CustomerId },
+                customerDTO);
         }
-        [HttpPut("{id:int}")]
-        public ActionResult<CustomerDTO> Put(int id, UpdateCustomerDTO dto)
+        [HttpPut("{id:int:min(1)}")]
+        public async Task<ActionResult<CustomerDTO>> Put(int id, UpdateCustomerDTO dto)
         {
-            try
+
+            var customer = await _context.Customers.FindAsync(id);
+
+            if (customer is null)
             {
-                var customer = _context.Customers.Find(id);
-
-                if (customer is null)
-                    return NotFound();
-
-
-                customer.SetName(dto.Name);
-                customer.SetEmail(dto.Email);
-                customer.SetPhone(dto.Phone);
-                customer.SetDocument(dto.Document);
-
-                _context.SaveChanges();
-
-                var customerDTO = new CustomerDTO
-                {
-                    CustomerId = customer.CustomerId,
-                    Name = customer.Name,
-                    Email = customer.Email,
-                    Phone = customer.Phone,
-                    Document = customer.Document
-                };
-
-                return Ok(customerDTO);
+                _logger.LogWarning($"Customer with id= {id} not found...");
+                return NotFound("Customer not found.");
             }
-            catch (Exception)
+
+
+            customer.SetName(dto.Name);
+            customer.SetEmail(dto.Email);
+            customer.SetPhone(dto.Phone);
+            customer.SetDocument(dto.Document);
+
+            await _context.SaveChangesAsync();
+
+            var customerDTO = new CustomerDTO
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Phone = customer.Phone,
+                Document = customer.Document
+            };
+
+            return Ok(customerDTO);
         }
-        [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+
+        [HttpDelete("{id:int:min(1)}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            try
+            var customer = await _context.Customers.FindAsync(id);
+
+            if (customer is null)
             {
-                var customer = _context.Customers.FirstOrDefault(p => p.CustomerId == id);
-
-                if (customer is null)
-                    return NotFound();
-
-                _context.Customers.Remove(customer);
-                _context.SaveChanges();
-
-                return NoContent();
+                _logger.LogWarning($"Customer with id= {id} not found...");
+                return NotFound("Customer not found.");
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+
+            _context.Customers.Remove(customer);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+
         }
     }
 }

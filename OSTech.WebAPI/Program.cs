@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OSTech.EFCore.Context;
+using OSTech.WebAPI.Extensions;
+using OSTech.WebAPI.Logging;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +22,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
            options.UseMySql(mysqlConnection, 
            ServerVersion.AutoDetect(mysqlConnection)));
 
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    LogLevel = LogLevel.Information
+}));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +35,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwaggerUI(options =>
             options.SwaggerEndpoint("/openapi/v1.json", "weather api"));
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();

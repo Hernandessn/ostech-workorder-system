@@ -12,182 +12,167 @@ namespace OSTech.WebAPI.Controllers
     public class WorkOrderController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<WorkOrderController> _logger;
 
-        public WorkOrderController(AppDbContext context)
+
+        public WorkOrderController(AppDbContext context, ILogger<WorkOrderController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<WorkOrderDTO>> Get()
+        public async Task<ActionResult<IEnumerable<WorkOrderDTO>>> Get()
         {
-            try
-            {
-                var workOrders = _context.WorkOrders
-                                         .AsNoTracking()
-                                         .Select(t => new WorkOrderDTO
-                                         {
-                                             TechnicianId = t.TechnicianId,
-                                             Title = t.Title,
-                                             Description = t.Description,
-                                             Amount = t.Amount,
-                                             Deadline = t.Deadline,
-                                             OpeningDate = t.OpeningDate,
-                                             CustomerId = t.CustomerId,
-                                             CategoryId = t.CategoryId,
-                                             EquipmentId = t.EquipmentId
-                                         })
-                                         .ToList();
-                return Ok(workOrders);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                           "An issue occurred while processing your request.");
-            }
+
+            var workOrders = await _context.WorkOrders
+                                     .AsNoTracking()
+                                     .Select(t => new WorkOrderDTO
+                                     {
+                                         WorkOrderId = t.WorkOrderId,
+                                         TechnicianId = t.TechnicianId,
+                                         Title = t.Title,
+                                         Description = t.Description,
+                                         Amount = t.Amount,
+                                         Deadline = t.Deadline,
+                                         OpeningDate = t.OpeningDate,
+                                         CustomerId = t.CustomerId,
+                                         CategoryId = t.CategoryId,
+                                         EquipmentId = t.EquipmentId
+                                     })
+                                     .ToListAsync();
+            return Ok(workOrders);
+
         }
 
-        [HttpGet("{id:int}", Name = "GetWorkOrder")]
-        public ActionResult<WorkOrderDTO> Get(int id)
+        [HttpGet("{id:int:min(1)}", Name = "GetWorkOrder")]
+        public async Task<ActionResult<WorkOrderDTO>> Get(int id)
         {
-            try
+
+            var workOrder = await _context.WorkOrders
+                                     .AsNoTracking()
+                                     .FirstOrDefaultAsync(t => t.WorkOrderId == id);
+
+            if (workOrder is null)
             {
-                var workOrder = _context.WorkOrders
-                                         .AsNoTracking()
-                                         .FirstOrDefault(t => t.WorkOrderId == id);
-
-                if (workOrder is null)
-                    return NotFound();
-
-                var dto = new WorkOrderDTO
-                {
-                    TechnicianId = workOrder.TechnicianId,
-                    Title = workOrder.Title,
-                    Description = workOrder.Description,
-                    Amount = workOrder.Amount,
-                    Deadline = workOrder.Deadline,
-                    OpeningDate = workOrder.OpeningDate,
-                    CustomerId = workOrder.CustomerId,
-                    CategoryId = workOrder.CategoryId,
-                    EquipmentId = workOrder.EquipmentId
-                };
-
-                return Ok(dto);
+                _logger.LogWarning($"WorkOrder with id= {id} not found...");
+                return NotFound("WorkOrder not found.");
             }
-            catch (Exception)
+
+            var dto = new WorkOrderDTO
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+                WorkOrderId = workOrder.WorkOrderId,
+                TechnicianId = workOrder.TechnicianId,
+                Title = workOrder.Title,
+                Description = workOrder.Description,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
+
+            return Ok(dto);
+
         }
         [HttpPost]
-        public ActionResult<WorkOrderDTO> Post(CreateWorkOrderDTO dto)
+        public async Task<ActionResult<WorkOrderDTO>> Post(CreateWorkOrderDTO dto)
         {
-            try
+
+            var workOrder = new WorkOrder(
+                dto.Description,
+                dto.Title,
+                dto.Amount,
+                dto.Deadline,
+                dto.OpeningDate,
+                dto.TechnicianId,
+                dto.CustomerId,
+                dto.CategoryId,
+                dto.EquipmentId
+            );
+
+            await _context.WorkOrders.AddAsync(workOrder);
+            await _context.SaveChangesAsync();
+
+            var workOrderDTO = new WorkOrderDTO
             {
-                var workOrder = new WorkOrder(
-                    dto.Description,
-                    dto.Title,
-                    dto.Amount,
-                    dto.Deadline,
-                    dto.OpeningDate,
-                    dto.TechnicianId,
-                    dto.CustomerId,
-                    dto.CategoryId,
-                    dto.EquipmentId
-                );
+                WorkOrderId = workOrder.WorkOrderId,
+                TechnicianId = workOrder.TechnicianId,
+                Title = workOrder.Title,
+                Description = workOrder.Description,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
 
-                _context.WorkOrders.Add(workOrder);
-                _context.SaveChanges();
+            return CreatedAtRoute(
+                "GetWorkOrder",
+                new { id = workOrder.WorkOrderId },
+                workOrderDTO);
 
-                var workOrderDTO = new WorkOrderDTO
-                {
-                    TechnicianId = workOrder.TechnicianId,
-                    Title = workOrder.Title,
-                    Description = workOrder.Description,
-                    Amount = workOrder.Amount,
-                    Deadline = workOrder.Deadline,
-                    OpeningDate = workOrder.OpeningDate,
-                    CustomerId = workOrder.CustomerId,
-                    CategoryId = workOrder.CategoryId,
-                    EquipmentId = workOrder.EquipmentId
-                };
-
-                return CreatedAtRoute(
-                    "GetWorkOrder",
-                    new { id = workOrder.WorkOrderId },
-                    workOrderDTO);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
         }
-        [HttpPut("{id:int}")]
-        public ActionResult<WorkOrderDTO> Put(int id, UpdateWorkOrderDTO dto)
+        [HttpPut("{id:int:min(1)}")]
+        public async Task<ActionResult<WorkOrderDTO>> Put(int id, UpdateWorkOrderDTO dto)
         {
-            try
+
+            var workOrder = await _context.WorkOrders.FindAsync(id);
+
+            if (workOrder is null)
             {
-                var workOrder = _context.WorkOrders.Find(id);
-
-                if (workOrder is null)
-                    return NotFound();
-
-                workOrder.SetDescription(dto.Description);
-                workOrder.SetTitle(dto.Title);
-                workOrder.SetAmount(dto.Amount);
-                workOrder.ChangeDeadline(dto.Deadline);
-
-                workOrder.AssignTechnician(dto.TechnicianId);
-                workOrder.AssignCustomer(dto.CustomerId);
-                workOrder.AssignCategory(dto.CategoryId);
-                workOrder.AssignEquipment(dto.EquipmentId);
-
-                _context.SaveChanges();
-
-                var workOrderDto = new WorkOrderDTO
-                {
-                    WorkOrderId = workOrder.WorkOrderId,
-                    Description = workOrder.Description,
-                    Title = workOrder.Title,
-                    Amount = workOrder.Amount,
-                    Deadline = workOrder.Deadline,
-                    OpeningDate = workOrder.OpeningDate,
-                    TechnicianId = workOrder.TechnicianId,
-                    CustomerId = workOrder.CustomerId,
-                    CategoryId = workOrder.CategoryId,
-                    EquipmentId = workOrder.EquipmentId
-                };
-
-                return Ok(workOrderDto);
+                _logger.LogWarning($"WorkOrder with id= {id} not found...");
+                return NotFound("WorkOrder not found.");
             }
-            catch (Exception)
+
+            workOrder.SetDescription(dto.Description);
+            workOrder.SetTitle(dto.Title);
+            workOrder.SetAmount(dto.Amount);
+            workOrder.ChangeDeadline(dto.Deadline);
+
+            workOrder.AssignTechnician(dto.TechnicianId);
+            workOrder.AssignCustomer(dto.CustomerId);
+            workOrder.AssignCategory(dto.CategoryId);
+            workOrder.AssignEquipment(dto.EquipmentId);
+
+            await _context.SaveChangesAsync();
+
+            var workOrderDto = new WorkOrderDTO
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+                WorkOrderId = workOrder.WorkOrderId,
+                Description = workOrder.Description,
+                Title = workOrder.Title,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                TechnicianId = workOrder.TechnicianId,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
+
+            return Ok(workOrderDto);
+
         }
-        [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        [HttpDelete("{id:int:min(1)}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            try
+
+            var workOrder = await _context.WorkOrders.FindAsync(id);
+
+            if (workOrder is null)
             {
-                var workOrder = _context.WorkOrders.FirstOrDefault(p => p.WorkOrderId == id);
-
-                if (workOrder is null)
-                    return NotFound();
-
-                _context.WorkOrders.Remove(workOrder);
-                _context.SaveChanges();
-
-                return NoContent();
+                _logger.LogWarning($"WorkOrder with id= {id} not found...");
+                return NotFound("WorkOrder not found.");
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                            "An issue occurred while processing your request.");
-            }
+
+            _context.WorkOrders.Remove(workOrder);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+
         }
     }
 }
