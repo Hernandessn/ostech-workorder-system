@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
 using OSTech.EFCore.Context;
 using OSTech.WebAPI.Dtos.Equipment;
+using OSTech.WebAPI.Repositories;
+using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -10,40 +13,29 @@ namespace OSTech.WebAPI.Controllers
     [ApiController]
     public class EquipmentController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly ILogger<EquipmentController> _logger;
-
-
-        public EquipmentController(AppDbContext context, ILogger<EquipmentController> logger)
+        private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
+        public EquipmentController(ILogger<EquipmentController> logger, IUnitOfWork uof, IMapper mapper)
         {
-            _context = context;
             _logger = logger;
+            _uof = uof;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EquipmentDTO>>> Get()
         {
-            var equipments = await _context.Equipments
-                                     .AsNoTracking()
-                                     .Select(t => new EquipmentDTO
-                                     {
-                                         EquipmentId = t.EquipmentId,
-                                         Name = t.Name,
-                                         Brand = t.Brand,
-                                         Model = t.Model,
-                                         SerialNumber = t.SerialNumber
-                                     })
-                                     .ToListAsync();
-            return Ok(equipments);
+            var equipments = await _uof.EquipmentRepository.GetAll();
+            var equipmentsDto = _mapper.Map<IEnumerable<EquipmentDTO>>(equipments);
 
+            return Ok(equipments);
         }
 
         [HttpGet("{id:int:min(1)}", Name = "GetEquipments")]
         public async Task<ActionResult<EquipmentDTO>> Get(int id)
         {
-            var equipment = await _context.Equipments
-                                     .AsNoTracking()
-                                     .FirstOrDefaultAsync(t => t.EquipmentId == id);
+            var equipment = await _uof.EquipmentRepository.GetById(c => c.EquipmentId == id);
 
             if (equipment is null)
             {
@@ -51,14 +43,7 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Equipment not found.");
             }
 
-            var dto = new EquipmentDTO
-            {
-                EquipmentId = equipment.EquipmentId,
-                Name = equipment.Name,
-                Brand = equipment.Brand,
-                Model = equipment.Model,
-                SerialNumber = equipment.SerialNumber
-            };
+            var dto = _mapper.Map<EquipmentDTO>(equipment);
 
             return Ok(dto);
 
@@ -73,8 +58,8 @@ namespace OSTech.WebAPI.Controllers
                 dto.SerialNumber
             );
 
-            await _context.Equipments.AddAsync(equipment);
-            await _context.SaveChangesAsync();
+            await _uof.EquipmentRepository.Create(equipment);
+            await _uof.CommitAsync();
 
             var equipmentDTO = new EquipmentDTO
             {
@@ -94,7 +79,7 @@ namespace OSTech.WebAPI.Controllers
         [HttpPut("{id:int:min(1)}")]
         public async Task<ActionResult<EquipmentDTO>> Put(int id, UpdateEquipmentDTO dto)
         {
-            var equipment = await _context.Equipments.FindAsync(id); 
+            var equipment = await _uof.EquipmentRepository.GetById(c => c.EquipmentId == id);
 
             if (equipment is null)
             {
@@ -102,12 +87,8 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Equipment not found.");
             }
 
-            equipment.SetName(dto.Name);
-            equipment.SetBrand(dto.Brand);
-            equipment.SetModel(dto.Model);
-            equipment.SetSerialNumber(dto.SerialNumber);
-
-            await _context.SaveChangesAsync();
+            await _uof.EquipmentRepository.Update(equipment);
+            await _uof.CommitAsync();
 
             var equipmentDTO = new EquipmentDTO
             {
@@ -124,7 +105,7 @@ namespace OSTech.WebAPI.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var equipment = await _context.Equipments.FindAsync(id);
+            var equipment = await _uof.EquipmentRepository.GetById(c => c.EquipmentId == id);
 
             if (equipment is null)
             {
@@ -132,8 +113,8 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Equipment not found.");
             }
 
-            _context.Equipments.Remove(equipment);
-            await _context.SaveChangesAsync();
+            await _uof.EquipmentRepository.Delete(equipment.EquipmentId);
+            await _uof.CommitAsync();
 
             return NoContent();
 

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
 using OSTech.EFCore.Context;
 using OSTech.WebAPI.Dtos.Technician;
 using OSTech.WebAPI.Dtos.WorkOrder;
+using OSTech.WebAPI.Repositories;
+using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -11,37 +14,24 @@ namespace OSTech.WebAPI.Controllers
     [ApiController]
     public class WorkOrderController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly ILogger<WorkOrderController> _logger;
-
-
-        public WorkOrderController(AppDbContext context, ILogger<WorkOrderController> logger)
+        private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
+        public WorkOrderController(ILogger<WorkOrderController> logger, IUnitOfWork uof, IMapper mapper)
         {
-            _context = context;
             _logger = logger;
+            _uof = uof;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkOrderDTO>>> Get()
         {
 
-            var workOrders = await _context.WorkOrders
-                                     .AsNoTracking()
-                                     .Select(t => new WorkOrderDTO
-                                     {
-                                         WorkOrderId = t.WorkOrderId,
-                                         TechnicianId = t.TechnicianId,
-                                         Title = t.Title,
-                                         Description = t.Description,
-                                         Amount = t.Amount,
-                                         Deadline = t.Deadline,
-                                         OpeningDate = t.OpeningDate,
-                                         CustomerId = t.CustomerId,
-                                         CategoryId = t.CategoryId,
-                                         EquipmentId = t.EquipmentId
-                                     })
-                                     .ToListAsync();
-            return Ok(workOrders);
+            var workOrders = await _uof.WorkOrderRepository.GetAll();
+            var workOrdersDto = _mapper.Map<IEnumerable<WorkOrderDTO>>(workOrders);
+
+            return Ok(workOrdersDto);
 
         }
 
@@ -49,9 +39,7 @@ namespace OSTech.WebAPI.Controllers
         public async Task<ActionResult<WorkOrderDTO>> Get(int id)
         {
 
-            var workOrder = await _context.WorkOrders
-                                     .AsNoTracking()
-                                     .FirstOrDefaultAsync(t => t.WorkOrderId == id);
+            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
 
             if (workOrder is null)
             {
@@ -59,19 +47,7 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("WorkOrder not found.");
             }
 
-            var dto = new WorkOrderDTO
-            {
-                WorkOrderId = workOrder.WorkOrderId,
-                TechnicianId = workOrder.TechnicianId,
-                Title = workOrder.Title,
-                Description = workOrder.Description,
-                Amount = workOrder.Amount,
-                Deadline = workOrder.Deadline,
-                OpeningDate = workOrder.OpeningDate,
-                CustomerId = workOrder.CustomerId,
-                CategoryId = workOrder.CategoryId,
-                EquipmentId = workOrder.EquipmentId
-            };
+            var dto = _mapper.Map<WorkOrderDTO>(workOrder);
 
             return Ok(dto);
 
@@ -92,8 +68,8 @@ namespace OSTech.WebAPI.Controllers
                 dto.EquipmentId
             );
 
-            await _context.WorkOrders.AddAsync(workOrder);
-            await _context.SaveChangesAsync();
+            await _uof.WorkOrderRepository.Create(workOrder);
+            await _uof.CommitAsync();
 
             var workOrderDTO = new WorkOrderDTO
             {
@@ -119,7 +95,7 @@ namespace OSTech.WebAPI.Controllers
         public async Task<ActionResult<WorkOrderDTO>> Put(int id, UpdateWorkOrderDTO dto)
         {
 
-            var workOrder = await _context.WorkOrders.FindAsync(id);
+            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
 
             if (workOrder is null)
             {
@@ -137,7 +113,8 @@ namespace OSTech.WebAPI.Controllers
             workOrder.AssignCategory(dto.CategoryId);
             workOrder.AssignEquipment(dto.EquipmentId);
 
-            await _context.SaveChangesAsync();
+            await _uof.WorkOrderRepository.Update(workOrder);
+            await _uof.CommitAsync();
 
             var workOrderDto = new WorkOrderDTO
             {
@@ -160,7 +137,7 @@ namespace OSTech.WebAPI.Controllers
         public async Task<ActionResult> Delete(int id)
         {
 
-            var workOrder = await _context.WorkOrders.FindAsync(id);
+            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
 
             if (workOrder is null)
             {
@@ -168,8 +145,8 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("WorkOrder not found.");
             }
 
-            _context.WorkOrders.Remove(workOrder);
-            await _context.SaveChangesAsync();
+            await _uof.WorkOrderRepository.Delete(id);
+            await _uof.CommitAsync();
 
             return NoContent();
 

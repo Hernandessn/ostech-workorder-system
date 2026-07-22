@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using OSTech.EFCore.Context;
+using OSTech.WebAPI.DTOs.Mappings;
 using OSTech.WebAPI.Extensions;
 using OSTech.WebAPI.Logging;
+using OSTech.WebAPI.Repositories;
+using OSTech.WebAPI.Repositories.UnitOfWork;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +29,10 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
 {
     LogLevel = LogLevel.Information
 }));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

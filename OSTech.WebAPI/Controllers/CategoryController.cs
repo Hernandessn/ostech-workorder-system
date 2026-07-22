@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
-using OSTech.EFCore.Context;
 using OSTech.WebAPI.Dtos.Category;
+using OSTech.WebAPI.Repositories;
+using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -10,36 +12,30 @@ namespace OSTech.WebAPI.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly ILogger<CategoryController> _logger;
-
-        public CategoryController(AppDbContext context, ILogger<CategoryController> logger)
+        private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
+        public CategoryController(ILogger<CategoryController> logger, IUnitOfWork uof, IMapper mapper)
         {
-            _context = context;
             _logger = logger;
+            _uof = uof;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> Get()
         {
-            var categories = await _context.Categories
-                                     .AsNoTracking()
-                                     .Select(t => new CategoryDTO
-                                     {
-                                         CategoryId = t.CategoryId,
-                                         Name = t.Name,
-                                         Description = t.Description
-                                     })
-                                     .ToListAsync();
-            return Ok(categories);
+            var categories = await _uof.CategoryRepository.GetAll();
+
+            var categoritesDto = _mapper.Map<IEnumerable<CategoryDTO>>(categories);
+
+            return Ok(categoritesDto);
         }
 
         [HttpGet("{id:int:min(1)}", Name = "GetCategory")]
         public async Task<ActionResult<CategoryDTO>> Get(int id)
         {
-            var category = await _context.Categories
-                                     .AsNoTracking()
-                                     .FirstOrDefaultAsync(t => t.CategoryId == id);
+            var category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);
 
             if (category is null)
             {
@@ -47,13 +43,7 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Category not found.");
             }
 
-
-            var dto = new CategoryDTO
-            {
-                CategoryId = category.CategoryId,
-                Name = category.Name,
-                Description = category.Description
-            };
+            var dto = _mapper.Map<CategoryDTO>(category);
 
             return Ok(dto);
         }
@@ -69,8 +59,9 @@ namespace OSTech.WebAPI.Controllers
                 _logger.LogWarning($"Invalid data...");
                 return BadRequest("Invalid data");
             }
-            await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
+
+            await _uof.CategoryRepository.Create(category);
+            await _uof.CommitAsync();
 
             var categoryDTO = new CategoryDTO
             {
@@ -84,10 +75,11 @@ namespace OSTech.WebAPI.Controllers
                 new { id = category.CategoryId },
                 categoryDTO);
         }
+
         [HttpPut("{id:int:min(1)}")]
         public async Task<ActionResult<CategoryDTO>> Put(int id, UpdateCategoryDTO dto)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);
 
             if (category is null)
             {
@@ -98,21 +90,25 @@ namespace OSTech.WebAPI.Controllers
             category.SetName(dto.Name);
             category.SetDescription(dto.Description);
 
-            await _context.SaveChangesAsync();
+            await _uof.CategoryRepository.Update(category);
+            await _uof.CommitAsync();
 
-            var categoryDTO = new CategoryDTO
+            var categoryDto = new CategoryDTO
             {
                 CategoryId = category.CategoryId,
                 Name = category.Name,
                 Description = category.Description
             };
 
-            return Ok(categoryDTO);
+            _logger.LogInformation("Category updated. Id={Id}", id);
+
+            return Ok(categoryDto);
         }
+
         [HttpDelete("{id:int:min(1)}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);
 
             if (category is null)
             {
@@ -120,8 +116,10 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Category not found.");
             }
 
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            await _uof.CategoryRepository.Delete(id);
+            await _uof.CommitAsync();
+
+            _logger.LogInformation("Category deleted. Id={Id}", id);
 
             return NoContent();
         }
