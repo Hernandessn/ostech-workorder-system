@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
 using OSTech.WebAPI.Dtos.Category;
@@ -10,6 +12,7 @@ namespace OSTech.WebAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [EnableRateLimiting("fixedwindow")]
     public class CategoryController : ControllerBase
     {
         private readonly ILogger<CategoryController> _logger;
@@ -22,6 +25,7 @@ namespace OSTech.WebAPI.Controllers
             _mapper = mapper;
         }
 
+        //[Authorize(Policy = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> Get()
         {
@@ -32,6 +36,7 @@ namespace OSTech.WebAPI.Controllers
             return Ok(categoritesDto);
         }
 
+       // [Authorize(Policy = "User")]
         [HttpGet("{id:int:min(1)}", Name = "GetCategory")]
         public async Task<ActionResult<CategoryDTO>> Get(int id)
         {
