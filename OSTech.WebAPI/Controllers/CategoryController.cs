@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -10,9 +11,11 @@ using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
-    [Route("[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [ApiController]
     [EnableRateLimiting("fixedwindow")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class CategoryController : ControllerBase
     {
         private readonly ILogger<CategoryController> _logger;
@@ -24,7 +27,10 @@ namespace OSTech.WebAPI.Controllers
             _uof = uof;
             _mapper = mapper;
         }
-
+        /// <summary>
+        /// Obtém todas as categorias cadastradas
+        /// </summary>
+        /// <returns>Lista de Categorias</returns>
         //[Authorize(Policy = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> Get()
@@ -35,7 +41,11 @@ namespace OSTech.WebAPI.Controllers
 
             return Ok(categoritesDto);
         }
-
+        /// <summary>
+        /// Obter uma categoria pelo Id
+        /// </summary>
+        /// <param name="id">Id da categoria</param>
+        /// <returns>A categoria encontrada</returns>
        // [Authorize(Policy = "User")]
         [HttpGet("{id:int:min(1)}", Name = "GetCategory")]
         public async Task<ActionResult<CategoryDTO>> Get(int id)

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -11,6 +12,7 @@ using OSTech.WebAPI.Extensions;
 using OSTech.WebAPI.Logging;
 using OSTech.WebAPI.Repositories.UnitOfWork;
 using OSTech.WebAPI.Services;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -69,6 +71,9 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
 });
 
 string mysqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -138,6 +143,20 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
         options.QueueLimit = 2;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
+});
+
+builder.Services.AddApiVersioning(o =>
+{
+    o.DefaultApiVersion = new ApiVersion(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ReportApiVersions = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+                         new QueryStringApiVersionReader(),
+                         new UrlSegmentApiVersionReader());
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

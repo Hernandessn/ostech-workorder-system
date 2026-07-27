@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OSTech.Domain.Entities;
@@ -9,8 +10,10 @@ using System.Security.Claims;
 
 namespace OSTech.WebAPI.Controllers
 {
-    [Route("[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly ITokenService _tokenService;
@@ -88,7 +91,12 @@ namespace OSTech.WebAPI.Controllers
             }
             return BadRequest(new { error = "Unable to find user" });
         }
-
+        /// <summary>
+        /// Verifica as credencias de um usuário
+        /// </summary>
+        /// <param name="model">Um objeto do tipo UsuarioDTO</param>
+        /// <returns>Status 200 e o token para o cliente</returns>
+        /// <remarks>Retorna o Status 200 e o token</remarks>
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -136,6 +144,28 @@ namespace OSTech.WebAPI.Controllers
             return Unauthorized();
         }
 
+        /// <summary>
+        /// Cadastra um novo usuário.
+        /// </summary>
+        /// <param name="model">
+        /// Dados necessários para o cadastro do usuário.
+        /// </param>
+        /// <returns>
+        /// Retorna 200 quando o usuário é criado com sucesso.
+        /// Retorna 400 quando os dados são inválidos.
+        /// Retorna 409 quando o usuário já existe.
+        /// </returns>
+        /// <remarks>
+        /// Exemplo:
+        ///
+        ///     POST /Auth/register
+        ///     {
+        ///         "userName": "usuario",
+        ///         "email": "usuario@email.com",
+        ///         "password": "Senha@123"
+        ///     }
+        ///
+        /// </remarks>
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)

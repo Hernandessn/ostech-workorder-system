@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
@@ -10,8 +11,10 @@ using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
-    [Route("[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
@@ -23,7 +26,10 @@ namespace OSTech.WebAPI.Controllers
             _uof = uof;
             _mapper = mapper;
         }
-
+        /// <summary>
+        /// Obtém todos os clientes cadastrados
+        /// </summary>
+        /// <returns>Lista de Clientes</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerDTO>>> Get()
         {
@@ -33,7 +39,11 @@ namespace OSTech.WebAPI.Controllers
 
             return Ok(customersDto);
         }
-
+        /// <summary>
+        /// Obter o cliente pelo Id
+        /// </summary>
+        /// <param name="id">Id do Cliente</param>
+        /// <returns>O cliente encontrado</returns>
         [HttpGet("{id:int:min(1)}", Name = "GetCustomers")]
         public async Task<ActionResult<CustomerDTO>> Get(int id)
         {

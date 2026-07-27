@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
@@ -10,8 +11,9 @@ using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class WorkOrderController : ControllerBase
     {
         private readonly ILogger<WorkOrderController> _logger;
@@ -23,7 +25,10 @@ namespace OSTech.WebAPI.Controllers
             _uof = uof;
             _mapper = mapper;
         }
-
+        /// <summary>
+        /// Obtém uma lista de ordens de serviços cadastrados
+        /// </summary>
+        /// <returns>Lista de Ordens de Serviços</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkOrderDTO>>> Get()
         {
@@ -34,7 +39,11 @@ namespace OSTech.WebAPI.Controllers
             return Ok(workOrdersDto);
 
         }
-
+        /// <summary>
+        /// Obter uma ordem de serviço pelo Id
+        /// </summary>
+        /// <param name="id">id da Ordem de Serviço</param>
+        /// <returns>Ordem de Serviço encontrada</returns>
         [HttpGet("{id:int:min(1)}", Name = "GetWorkOrder")]
         public async Task<ActionResult<WorkOrderDTO>> Get(int id)
         {

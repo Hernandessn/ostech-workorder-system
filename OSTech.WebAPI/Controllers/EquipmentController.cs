@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
@@ -9,8 +10,10 @@ using OSTech.WebAPI.Repositories.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {
-    [Route("[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class EquipmentController : ControllerBase
     {
         private readonly ILogger<EquipmentController> _logger;
@@ -22,7 +25,10 @@ namespace OSTech.WebAPI.Controllers
             _uof = uof;
             _mapper = mapper;
         }
-
+        /// <summary>
+        /// Obtém todos os equipamentos cadastrados 
+        /// </summary>
+        /// <returns>Lista de Equipamentos</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EquipmentDTO>>> Get()
         {
@@ -31,7 +37,11 @@ namespace OSTech.WebAPI.Controllers
 
             return Ok(equipments);
         }
-
+        /// <summary>
+        /// Obter um equipamento pelo Id
+        /// </summary>
+        /// <param name="id">Id do equipamento</param>
+        /// <returns>Equipamento encontrado</returns>
         [HttpGet("{id:int:min(1)}", Name = "GetEquipments")]
         public async Task<ActionResult<EquipmentDTO>> Get(int id)
         {

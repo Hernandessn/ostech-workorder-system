@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OSTech.Domain.Entities;
@@ -10,8 +11,10 @@ using System.Text.Json.Serialization;
 
 namespace OSTech.WebAPI.Controllers
 {
-    [Route("[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class TechnicianController : ControllerBase
     {
         private readonly ILogger<TechnicianController> _logger;
@@ -54,7 +57,10 @@ namespace OSTech.WebAPI.Controllers
 
             return Ok(techniciansDto);
         }
-
+        /// <summary>
+        /// Obtém todos os técnicos cadastrados.
+        /// </summary>
+        /// <returns>Lista de técnicos.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TechnicianDTO>>> Get()
         {
@@ -64,7 +70,11 @@ namespace OSTech.WebAPI.Controllers
 
             return Ok(techniciansDto);
         }
-
+        /// <summary>
+        /// Obter um técnico pelo Id.
+        /// </summary>
+        /// <param name="id">Id do técnico.</param>
+        /// <returns>O técnico encontrado.</returns>
         [HttpGet("{id:int:min(1)}", Name = "GetTechnician")]
         public async Task<ActionResult<TechnicianDTO>> Get(int id)
         {
