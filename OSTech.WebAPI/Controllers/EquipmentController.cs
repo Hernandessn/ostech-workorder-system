@@ -7,6 +7,7 @@ using OSTech.EFCore.Context;
 using OSTech.WebAPI.Dtos.Equipment;
 using OSTech.WebAPI.Repositories;
 using OSTech.WebAPI.Repositories.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -30,12 +31,23 @@ namespace OSTech.WebAPI.Controllers
         /// </summary>
         /// <returns>Lista de Equipamentos</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<EquipmentDTO>>> Get()
         {
-            var equipments = await _uof.EquipmentRepository.GetAll();
-            var equipmentsDto = _mapper.Map<IEnumerable<EquipmentDTO>>(equipments);
+            try
+            {
+                var equipments = await _uof.EquipmentRepository.GetAll();
+                var equipmentsDto = _mapper.Map<IEnumerable<EquipmentDTO>>(equipments);
 
-            return Ok(equipments);
+                return Ok(equipmentsDto);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
         }
         /// <summary>
         /// Obter um equipamento pelo Id
@@ -61,6 +73,9 @@ namespace OSTech.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<EquipmentDTO>> Post(CreateEquipmentDTO dto)
         {
+            if(dto is null)
+                return BadRequest();
+
             var equipment = new Equipment(
                 dto.Name,
                 dto.Brand,
@@ -87,8 +102,17 @@ namespace OSTech.WebAPI.Controllers
 
         }
         [HttpPut("{id:int:min(1)}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<EquipmentDTO>> Put(int id, UpdateEquipmentDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
+
+            if (id <= 0)
+                return BadRequest();
+
             var equipment = await _uof.EquipmentRepository.GetById(c => c.EquipmentId == id);
 
             if (equipment is null)
@@ -113,6 +137,9 @@ namespace OSTech.WebAPI.Controllers
 
         }
         [HttpDelete("{id:int:min(1)}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult> Delete(int id)
         {
             var equipment = await _uof.EquipmentRepository.GetById(c => c.EquipmentId == id);

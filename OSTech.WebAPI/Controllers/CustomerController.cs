@@ -8,6 +8,7 @@ using OSTech.WebAPI.Dtos.Customer;
 using OSTech.WebAPI.Dtos.WorkOrder;
 using OSTech.WebAPI.Repositories;
 using OSTech.WebAPI.Repositories.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -31,13 +32,25 @@ namespace OSTech.WebAPI.Controllers
         /// </summary>
         /// <returns>Lista de Clientes</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<CustomerDTO>>> Get()
         {
-            var customers = await _uof.CustomerRepository.GetAll();
+            try
+            {
+                var customers = await _uof.CustomerRepository.GetAll();
 
-            var customersDto = _mapper.Map<IEnumerable<CustomerDTO>>(customers);
+                var customersDto = _mapper.Map<IEnumerable<CustomerDTO>>(customers);
 
-            return Ok(customersDto);
+                return Ok(customersDto);
+
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
         }
         /// <summary>
         /// Obter o cliente pelo Id
@@ -62,6 +75,9 @@ namespace OSTech.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerDTO>> Post(CreateCustomerDTO dto)
         {
+            if(dto is null)
+                return BadRequest();
+
             var customer = new Customer(
                 dto.Name,
                 dto.Email,
@@ -95,7 +111,11 @@ namespace OSTech.WebAPI.Controllers
         [HttpPut("{id:int:min(1)}")]
         public async Task<ActionResult<CustomerDTO>> Put(int id, UpdateCustomerDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
 
+            if (id <= 0)
+                return BadRequest();
             var customer = await _uof.CustomerRepository.GetById(c => c.CustomerId == id);
 
             if (customer is null)

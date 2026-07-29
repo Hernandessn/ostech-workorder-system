@@ -8,6 +8,7 @@ using OSTech.Domain.Entities;
 using OSTech.WebAPI.Dtos.Category;
 using OSTech.WebAPI.Repositories;
 using OSTech.WebAPI.Repositories.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -33,13 +34,22 @@ namespace OSTech.WebAPI.Controllers
         /// <returns>Lista de Categorias</returns>
         //[Authorize(Policy = "Admin")]
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> Get()
         {
-            var categories = await _uof.CategoryRepository.GetAll();
+            try
+            {
+                var categories = await _uof.CategoryRepository.GetAll();
+                var categoritesDto = _mapper.Map<IEnumerable<CategoryDTO>>(categories);
 
-            var categoritesDto = _mapper.Map<IEnumerable<CategoryDTO>>(categories);
-
-            return Ok(categoritesDto);
+                return Ok(categoritesDto);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
         /// <summary>
         /// Obter uma categoria pelo Id
@@ -65,6 +75,9 @@ namespace OSTech.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> Post(CreateCategoryDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
+
             var category = new Category(
                 dto.Name,
                 dto.Description
@@ -92,8 +105,18 @@ namespace OSTech.WebAPI.Controllers
         }
 
         [HttpPut("{id:int:min(1)}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<CategoryDTO>> Put(int id, UpdateCategoryDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
+
+            if (id <= 0)
+                return BadRequest();
+
+
             var category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);
 
             if (category is null)
@@ -121,6 +144,9 @@ namespace OSTech.WebAPI.Controllers
         }
 
         [HttpDelete("{id:int:min(1)}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult> Delete(int id)
         {
             var category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);

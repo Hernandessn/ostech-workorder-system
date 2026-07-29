@@ -8,6 +8,7 @@ using OSTech.WebAPI.Dtos.Technician;
 using OSTech.WebAPI.Dtos.WorkOrder;
 using OSTech.WebAPI.Repositories;
 using OSTech.WebAPI.Repositories.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -30,14 +31,22 @@ namespace OSTech.WebAPI.Controllers
         /// </summary>
         /// <returns>Lista de Ordens de Serviços</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<WorkOrderDTO>>> Get()
         {
+            try
+            {
+                var workOrders = await _uof.WorkOrderRepository.GetAll();
+                var workOrdersDto = _mapper.Map<IEnumerable<WorkOrderDTO>>(workOrders);
 
-            var workOrders = await _uof.WorkOrderRepository.GetAll();
-            var workOrdersDto = _mapper.Map<IEnumerable<WorkOrderDTO>>(workOrders);
-
-            return Ok(workOrdersDto);
-
+                return Ok(workOrdersDto);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
         /// <summary>
         /// Obter uma ordem de serviço pelo Id
@@ -62,8 +71,13 @@ namespace OSTech.WebAPI.Controllers
 
         }
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<WorkOrderDTO>> Post(CreateWorkOrderDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
 
             var workOrder = new WorkOrder(
                 dto.Description,
@@ -103,6 +117,11 @@ namespace OSTech.WebAPI.Controllers
         [HttpPut("{id:int:min(1)}")]
         public async Task<ActionResult<WorkOrderDTO>> Put(int id, UpdateWorkOrderDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
+
+            if (id <= 0)
+                return BadRequest();
 
             var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
 
@@ -143,6 +162,9 @@ namespace OSTech.WebAPI.Controllers
 
         }
         [HttpDelete("{id:int:min(1)}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult> Delete(int id)
         {
 

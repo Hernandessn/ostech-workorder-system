@@ -8,6 +8,7 @@ using OSTech.WebAPI.Filters;
 using OSTech.WebAPI.Pagination;
 using OSTech.WebAPI.Repositories.UnitOfWork;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -62,13 +63,24 @@ namespace OSTech.WebAPI.Controllers
         /// </summary>
         /// <returns>Lista de técnicos.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<TechnicianDTO>>> Get()
         {
-            var technicians = await _uof.TechnicianRepository.GetAll();
+            try
+            {
+                var technicians = await _uof.TechnicianRepository.GetAll();
 
-            var techniciansDto = _mapper.Map<IEnumerable<TechnicianDTO>>(technicians);
+                var techniciansDto = _mapper.Map<IEnumerable<TechnicianDTO>>(technicians);
 
-            return Ok(techniciansDto);
+                return Ok(techniciansDto);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
         }
         /// <summary>
         /// Obter um técnico pelo Id.
@@ -93,6 +105,8 @@ namespace OSTech.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<TechnicianDTO>> Post(CreateTechnicianDTO dto)
         {
+            if(dto is null)
+                return BadRequest();
 
             var technician = new Technician(
                 dto.Name,
@@ -128,6 +142,12 @@ namespace OSTech.WebAPI.Controllers
         [HttpPut("{id:int:min(1)}")]
         public async Task<ActionResult<TechnicianDTO>> Put(int id, UpdateTechnicianDTO dto)
         {
+            if (dto is null)
+                return BadRequest();
+
+            if (id <= 0)
+                return BadRequest();
+
             var technician = await _uof.TechnicianRepository.GetById(c => c.TechnicianId == id);
 
             if (technician is null)
