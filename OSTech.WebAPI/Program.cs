@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OSTech.Application.Mappings;
 using OSTech.Domain.Entities;
 using OSTech.EFCore.Context;
-using OSTech.WebAPI.DTOs.Mappings;
+using OSTech.Infrastructure.Authentication.JWT;
+using OSTech.Infrastructure.UnitOfWork;
 using OSTech.WebAPI.Extensions;
 using OSTech.WebAPI.Logging;
-using OSTech.WebAPI.Repositories.UnitOfWork;
-using OSTech.WebAPI.Services;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -159,8 +159,10 @@ builder.Services.AddApiVersioning(o =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ITokenService,  TokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

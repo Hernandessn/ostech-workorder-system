@@ -1,6 +1,7 @@
 ﻿using OSTech.EFCore.Context;
+using OSTech.WebAPI.Repositories;
 
-namespace OSTech.WebAPI.Repositories.UnitOfWork
+namespace OSTech.Infrastructure.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {

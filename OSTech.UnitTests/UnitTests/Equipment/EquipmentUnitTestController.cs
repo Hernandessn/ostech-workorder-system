@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OSTech.EFCore.Context;
-using OSTech.WebAPI.DTOs.Mappings;
-using OSTech.WebAPI.Repositories.UnitOfWork;
+using OSTech.Infrastructure.UnitOfWork;
+using OSTech.Application.Mappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;

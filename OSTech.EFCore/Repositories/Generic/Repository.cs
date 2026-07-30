@@ -15,11 +15,13 @@ namespace OSTech.WebAPI.Repositories.Generic
         }
         public async Task<IEnumerable<T>> GetAll()
         {
+            await Task.Delay(3000);
             return await _context.Set<T>().AsNoTracking().ToListAsync();
         }
 
         public async Task<T?> GetById(Expression<Func<T, bool>> predicate)
         {
+            await Task.Delay(3000);
             return await _context.Set<T>().FirstOrDefaultAsync(predicate);
         }
 

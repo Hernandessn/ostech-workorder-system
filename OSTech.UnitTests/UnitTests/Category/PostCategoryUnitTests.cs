@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using OSTech.WebAPI.Controllers;
 using OSTech.WebAPI.Dtos.Category;
@@ -15,10 +16,13 @@ namespace OSTech.Tests.UnitTests.Category
     public class PostCategoryUnitTests : IClassFixture<CategoryUnitTestController>
     {
         private readonly CategoryController _controller;
+        private readonly IMemoryCache _memoryCache;
 
         public PostCategoryUnitTests(CategoryUnitTestController controller)
         {
-            _controller = new CategoryController(NullLogger<CategoryController>.Instance, controller.repository, controller.mapper);
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+
+            _controller = new CategoryController(NullLogger<CategoryController>.Instance, controller.repository, controller.mapper, _memoryCache);
 
         }
         [Fact]

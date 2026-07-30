@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OSTech.EFCore\OSTech.EFCore.csproj" />
+    <ProjectReference Include="..\OSTech.EFCore\OSTech.Infrastructure.csproj" />
     <ProjectReference Include="..\OSTech.WebAPI\OSTech.WebAPI.csproj" />
   </ItemGroup>
 

@@ -6,9 +6,9 @@ using OSTech.Domain.Entities;
 using OSTech.WebAPI.Dtos.Technician;
 using OSTech.WebAPI.Filters;
 using OSTech.WebAPI.Pagination;
-using OSTech.WebAPI.Repositories.UnitOfWork;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
+using OSTech.Infrastructure.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {

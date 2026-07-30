@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using OSTech.WebAPI.Controllers;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,14 @@ namespace OSTech.Tests.UnitTests.Category
     public class DeleteCategoryUnitTests : IClassFixture<CategoryUnitTestController>
     {
         private readonly CategoryController _controller;
-
+        private readonly IMemoryCache _memoryCache;
         public DeleteCategoryUnitTests(CategoryUnitTestController controller)
         {
-            _controller = new CategoryController(NullLogger<CategoryController>.Instance, controller.repository, controller.mapper);
+
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+
+            _controller = new CategoryController(NullLogger<CategoryController>.Instance, 
+                                                 controller.repository, controller.mapper, _memoryCache);
         }
 
         [Fact]

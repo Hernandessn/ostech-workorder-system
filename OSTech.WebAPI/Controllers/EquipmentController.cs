@@ -6,8 +6,8 @@ using OSTech.Domain.Entities;
 using OSTech.EFCore.Context;
 using OSTech.WebAPI.Dtos.Equipment;
 using OSTech.WebAPI.Repositories;
-using OSTech.WebAPI.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using OSTech.Infrastructure.UnitOfWork;
 
 namespace OSTech.WebAPI.Controllers
 {

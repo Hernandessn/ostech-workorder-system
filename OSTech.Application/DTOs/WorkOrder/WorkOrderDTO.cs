@@ -1,5 +1,6 @@
 ﻿using OSTech.Domain.Entities;
-using OSTech.Domain.Entities.Enums;
+using OSTech.Domain.Entities;
+using OSTech.Domain.Enums;
 
 namespace OSTech.WebAPI.Dtos.WorkOrder
 {

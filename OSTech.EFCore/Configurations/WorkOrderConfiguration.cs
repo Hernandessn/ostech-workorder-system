@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OSTech.Domain.Entities;
-using OSTech.Domain.Entities.Enums;
+using OSTech.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -7,8 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
 using OSTech.WebAPI.Dtos.Category;
 using OSTech.WebAPI.Repositories;
-using OSTech.WebAPI.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using OSTech.Infrastructure.UnitOfWork;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -22,11 +23,14 @@ namespace OSTech.WebAPI.Controllers
         private readonly ILogger<CategoryController> _logger;
         private readonly IUnitOfWork _uof;
         private readonly IMapper _mapper;
-        public CategoryController(ILogger<CategoryController> logger, IUnitOfWork uof, IMapper mapper)
+        private readonly IMemoryCache _cache;
+        private const string CacheCategoriesKey = "CacheCategories";
+        public CategoryController(ILogger<CategoryController> logger, IUnitOfWork uof, IMapper mapper, IMemoryCache cache)
         {
             _logger = logger;
             _uof = uof;
             _mapper = mapper;
+            _cache = cache;
         }
         /// <summary>
         /// Obtém todas as categorias cadastradas
@@ -41,7 +45,18 @@ namespace OSTech.WebAPI.Controllers
         {
             try
             {
-                var categories = await _uof.CategoryRepository.GetAll();
+                if (!_cache.TryGetValue(CacheCategoriesKey, out IEnumerable<Category>? categories))
+                {
+
+                    categories = await _uof.CategoryRepository.GetAll();
+                    if (categories is null || !categories.Any())
+                    {
+                        _logger.LogWarning("Não existem categorias...");
+                        return NotFound("Não existem categorias...");
+                    }
+                    SetCache(CacheCategoriesKey, categories);
+                }
+
                 var categoritesDto = _mapper.Map<IEnumerable<CategoryDTO>>(categories);
 
                 return Ok(categoritesDto);
@@ -60,12 +75,17 @@ namespace OSTech.WebAPI.Controllers
         [HttpGet("{id:int:min(1)}", Name = "GetCategory")]
         public async Task<ActionResult<CategoryDTO>> Get(int id)
         {
-            var category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);
-
-            if (category is null)
+            var cacheKey = GetCacheCategoryKey(id);
+            if (!_cache.TryGetValue(cacheKey, out Category? category))
             {
-                _logger.LogWarning($"Category with id= {id} not found...");
-                return NotFound("Category not found.");
+                category = await _uof.CategoryRepository.GetById(c => c.CategoryId == id);
+
+                if (category is null)
+                {
+                    _logger.LogWarning("Category with id {Id} not found.", id);
+                    return NotFound("Category not found.");
+                }
+                SetCache(cacheKey, category);
             }
 
             var dto = _mapper.Map<CategoryDTO>(category);
@@ -82,14 +102,11 @@ namespace OSTech.WebAPI.Controllers
                 dto.Name,
                 dto.Description
             );
-            if (category is null)
-            {
-                _logger.LogWarning($"Invalid data...");
-                return BadRequest("Invalid data");
-            }
 
             await _uof.CategoryRepository.Create(category);
             await _uof.CommitAsync();
+
+            InvalidateCacheAfterChange(category.CategoryId, category);
 
             var categoryDTO = new CategoryDTO
             {
@@ -131,6 +148,8 @@ namespace OSTech.WebAPI.Controllers
             await _uof.CategoryRepository.Update(category);
             await _uof.CommitAsync();
 
+            InvalidateCacheAfterChange(id, category);
+
             var categoryDto = new CategoryDTO
             {
                 CategoryId = category.CategoryId,
@@ -160,9 +179,30 @@ namespace OSTech.WebAPI.Controllers
             await _uof.CategoryRepository.Delete(id);
             await _uof.CommitAsync();
 
+            InvalidateCacheAfterChange(id);
+
             _logger.LogInformation("Category deleted. Id={Id}", id);
 
             return NoContent();
+        }
+        private string GetCacheCategoryKey(int id) => $"CacheCategory_{id}";
+        private void SetCache<T>(string key, T data)
+        {
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(15),
+                Priority = CacheItemPriority.High
+            };
+            _cache.Set(key, data, cacheOptions);
+        }
+        private void InvalidateCacheAfterChange(int id, Category? category = null)
+        {
+            _cache.Remove($"CacheCategory_{id}");
+            _cache.Remove(CacheCategoriesKey);
+
+            if (category != null)
+                SetCache(GetCacheCategoryKey(id), category);
         }
     }
 }

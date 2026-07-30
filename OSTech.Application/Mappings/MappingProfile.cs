@@ -6,7 +6,7 @@ using OSTech.WebAPI.Dtos.Equipment;
 using OSTech.WebAPI.Dtos.Technician;
 using OSTech.WebAPI.Dtos.WorkOrder;
 
-namespace OSTech.WebAPI.DTOs.Mappings
+namespace OSTech.Application.Mappings
 {
     public class MappingProfile : Profile
     {

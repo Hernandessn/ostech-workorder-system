@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OSTech.Domain.Entities;
 using OSTech.WebAPI.DTOs.Auth;
-using OSTech.WebAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using OSTech.Infrastructure.Authentication.JWT;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -99,6 +100,9 @@ namespace OSTech.WebAPI.Controllers
         /// <remarks>Retorna o Status 200 e o token</remarks>
         [HttpPost]
         [Route("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName!);

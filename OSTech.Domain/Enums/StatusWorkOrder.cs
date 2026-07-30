@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OSTech.Domain.Entities.Enums
+namespace OSTech.Domain.Enums
 {
     public enum StatusWorkOrder
     {

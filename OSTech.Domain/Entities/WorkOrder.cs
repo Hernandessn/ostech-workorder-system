@@ -1,4 +1,4 @@
-﻿using OSTech.Domain.Entities.Enums;
+﻿using OSTech.Domain.Enums;
 using OSTech.Domain.Exceptions;
 using System;
 using System.Collections.Generic;

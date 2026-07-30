@@ -1,7 +1,7 @@
 <Solution>
-  <Project Path="OSTech.Console/OSTech.Console.csproj" />
+  <Project Path="OSTech.Application/OSTech.Application.csproj" Id="369d3835-bde9-49bf-94e5-a59266359c90" />
   <Project Path="OSTech.Domain/OSTech.Domain.csproj" />
-  <Project Path="OSTech.EFCore/OSTech.EFCore.csproj" />
+  <Project Path="OSTech.EFCore/OSTech.Infrastructure.csproj" />
   <Project Path="OSTech.UnitTests/OSTech.Tests.csproj" Id="b6d0db43-c278-4218-b0a9-0da06258e7cd" />
   <Project Path="OSTech.WebAPI/OSTech.WebAPI.csproj" Id="76fc58ae-5ed3-498d-8f54-329d0d77acaf" />
 </Solution>

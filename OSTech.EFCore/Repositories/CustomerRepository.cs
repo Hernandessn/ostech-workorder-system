@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
 using OSTech.EFCore.Context;
-using OSTech.WebAPI.Dtos.Customer;
 using OSTech.WebAPI.Repositories.Generic;
 
 namespace OSTech.WebAPI.Repositories
