@@ -27,7 +27,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowedOrigins", 
+    options.AddPolicy("AllowedOrigins",
     policy =>
     {
         policy.AllowAnyOrigin()
@@ -79,7 +79,7 @@ builder.Services.AddSwaggerGen(c =>
 string mysqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-           options.UseMySql(mysqlConnection, 
+           options.UseMySql(mysqlConnection,
            ServerVersion.AutoDetect(mysqlConnection)));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -94,20 +94,21 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(options => { 
-    options.TokenValidationParameters = new TokenValidationParameters()
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ClockSkew = TimeSpan.Zero,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(secretKey))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(secretKey))
+        };
+    });
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 {
@@ -116,14 +117,14 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy => 
+    options.AddPolicy("Admin", policy =>
     policy.RequireRole("Admin"));
 
     options.AddPolicy("SuperAdmin", policy =>
     policy.RequireRole("Admin")
            .RequireClaim("id", "Hernandes"));
 
-    options.AddPolicy("User", policy => 
+    options.AddPolicy("User", policy =>
     policy.RequireRole("User"));
 
     options.AddPolicy("ExclusivePolicyOnly", policy =>
@@ -168,9 +169,12 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+
     app.UseSwagger();
 
     app.UseSwaggerUI(options =>

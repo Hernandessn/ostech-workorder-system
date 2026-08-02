@@ -4,4 +4,5 @@
   <Project Path="OSTech.EFCore/OSTech.Infrastructure.csproj" />
   <Project Path="OSTech.UnitTests/OSTech.Tests.csproj" Id="b6d0db43-c278-4218-b0a9-0da06258e7cd" />
   <Project Path="OSTech.WebAPI/OSTech.WebAPI.csproj" Id="76fc58ae-5ed3-498d-8f54-329d0d77acaf" />
+  <Project Path="OSTech.WebMVC/OSTech.WebMVC.csproj" Id="1d3061a9-cdbe-4264-92a3-4095ebcdf1ce" />
 </Solution>
