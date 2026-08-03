@@ -12,6 +12,8 @@ builder.Services.AddHttpClient("OSTechApi", client =>
 ;
 });
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 

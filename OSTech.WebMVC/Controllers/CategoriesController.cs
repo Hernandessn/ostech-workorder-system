@@ -86,7 +86,5 @@ namespace OSTech.WebMVC.Controllers
 
             return View(result);
         }
-
-
     }
 }

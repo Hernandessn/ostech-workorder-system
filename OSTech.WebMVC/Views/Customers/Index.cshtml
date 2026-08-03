@@ -1,0 +1,78 @@
+﻿@model IEnumerable<CustomerViewModel>
+
+<h2>Clientes</h2>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="pull-left">
+            <a asp-action="CreateNewCustomer" class="btn btn-primary">
+                <span class="fas fa-plus"></span> Novo Cliente
+            </a>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="panel panel-default">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Phone)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Document)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Phone)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Document)
+                    </td>
+
+                    <td>
+                        <a asp-action="UpdateCustomer"
+                           asp-route-id="@item.CustomerId"
+                           class="btn btn-warning"
+                           title="Editar">
+                            <span class="fas fa-edit"></span>
+                        </a>
+
+                        <a asp-action="DeleteCustomer"
+                           asp-route-id="@item.CustomerId"
+                           class="btn btn-danger"
+                           title="Excluir">
+                            <span class="fas fa-trash-alt"></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

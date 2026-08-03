@@ -123,7 +123,10 @@ namespace OSTech.WebAPI.Controllers
                 _logger.LogWarning($"Customer with id= {id} not found...");
                 return NotFound("Customer not found.");
             }
-
+            customer.SetName(dto.Name);
+            customer.SetEmail(dto.Email);
+            customer.SetPhone(dto.Phone);
+            customer.SetDocument(dto.Document);
 
             await _uof.CustomerRepository.Update(customer);
             await _uof.CommitAsync();

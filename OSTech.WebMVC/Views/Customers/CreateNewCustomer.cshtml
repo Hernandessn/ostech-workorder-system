@@ -1,0 +1,64 @@
+﻿@model CustomerViewModel
+
+<h2>Criar um Cliente</h2>
+
+<form asp-action="CreateNewCustomer">
+    <div class="form-horizontal">
+        <hr />
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Document" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Document" class="form-control" />
+                <span asp-validation-for="Document" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group" style="padding-top:10px">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Criar" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-info">Retornar</a>
+            </div>
+        </div>
+
+        @if (ViewBag.Erro != null)
+        {
+            <div style="color:red">
+                <h4>@ViewBag.Erro</h4>
+            </div>
+        }
+    </div>
+</form>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -121,6 +121,14 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Equipment not found.");
             }
 
+            equipment.SetName(dto.Name);
+            equipment.SetBrand(dto.Brand);
+            equipment.SetModel(dto.Model);
+            equipment.SetSerialNumber(dto.SerialNumber);
+
+            await _uof.EquipmentRepository.Update(equipment);
+            await _uof.CommitAsync();
+
             await _uof.EquipmentRepository.Update(equipment);
             await _uof.CommitAsync();
 
