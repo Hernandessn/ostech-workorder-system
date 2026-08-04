@@ -1,78 +1,66 @@
 ﻿@model IEnumerable<WorkOrderViewModel>
 
-<h2>Ordens de Serviço</h2>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="pull-left">
-            <a asp-action="CreateNewWorkOrder" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Nova Ordem de Serviço
-            </a>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Ordens de Serviço</h4>
+    <a asp-action="CreateNewWorkOrder" class="btn btn-primary btn-sm">
+        <i class="fas fa-plus"></i> Nova Ordem de Serviço
+    </a>
 </div>
 
-<br />
-
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Title)</th>
-            <th>@Html.DisplayNameFor(model => model.Description)</th>
-            <th>@Html.DisplayNameFor(model => model.Amount)</th>
-            <th>@Html.DisplayNameFor(model => model.OpeningDate)</th>
-            <th>@Html.DisplayNameFor(model => model.Deadline)</th>
-            <th>@Html.DisplayNameFor(model => model.Status)</th>
-            <th>Técnico</th>
-            <th>Cliente</th>
-            <th>Categoria</th>
-            <th>Equipamento</th>
-            <th></th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="card p-0" style="overflow-x: auto;">
+    <table class="table table-hover mb-0">
+        <thead>
             <tr>
-                <td>@item.Title</td>
-
-                <td>@item.Description</td>
-
-                <td>@item.Amount.ToString("C")</td>
-
-                <td>@item.OpeningDate.ToString("dd/MM/yyyy")</td>
-
-                <td>@item.Deadline.ToString("dd/MM/yyyy")</td>
-
-                <td>@item.Status</td>
-
-                <td>@item.TechnicianId</td>
-
-                <td>@item.CustomerId</td>
-
-                <td>@item.CategoryId</td>
-
-                <td>@item.EquipmentId</td>
-
-                <td>
-                    <a asp-action="UpdateWorkOrder"
-                       asp-route-id="@item.WorkOrderId"
-                       class="btn btn-warning"
-                       title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </a>
-
-                    <a asp-action="DeleteWorkOrder"
-                       asp-route-id="@item.WorkOrderId"
-                       class="btn btn-danger"
-                       title="Excluir">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </td>
+                <th class="ps-3">@Html.DisplayNameFor(model => model.Title)</th>
+                <th>@Html.DisplayNameFor(model => model.Description)</th>
+                <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                <th>@Html.DisplayNameFor(model => model.OpeningDate)</th>
+                <th>@Html.DisplayNameFor(model => model.Deadline)</th>
+                <th>@Html.DisplayNameFor(model => model.Status)</th>
+                <th>Técnico</th>
+                <th>Cliente</th>
+                <th>Categoria</th>
+                <th>Equipamento</th>
+                <th class="text-end pe-3" width="120"></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="ps-3">@item.Title</td>
+                    <td>@item.Description</td>
+                    <td>@item.Amount.ToString("C")</td>
+                    <td>@item.OpeningDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Deadline.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @{
+                            var statusText = item.Status.ToString() ?? "";
+                            var badgeClass = statusText switch
+                            {
+                                "Open" or "Aberta" or "Aberto" => "badge-status-open",
+                                "InProgress" or "Em andamento" or "EmAndamento" => "badge-status-progress",
+                                "Completed" or "Concluida" or "Concluída" or "Concluído" => "badge-status-done",
+                                "Cancelled" or "Cancelada" or "Cancelado" => "badge-status-cancelled",
+                                _ => "badge-status-cancelled"
+                            };
+                        }
+                        <span class="badge @badgeClass">@statusText</span>
+                    </td>
+                    <td>@item.TechnicianId</td>
+                    <td>@item.CustomerId</td>
+                    <td>@item.CategoryId</td>
+                    <td>@item.EquipmentId</td>
+                    <td class="text-end pe-3">
+                        <a asp-action="UpdateWorkOrder" asp-route-id="@item.WorkOrderId" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a asp-action="DeleteWorkOrder" asp-route-id="@item.WorkOrderId" class="btn btn-sm btn-danger" title="Excluir">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

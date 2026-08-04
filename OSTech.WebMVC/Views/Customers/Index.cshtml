@@ -1,74 +1,37 @@
 ﻿@model IEnumerable<CustomerViewModel>
 
-<h2>Clientes</h2>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="pull-left">
-            <a asp-action="CreateNewCustomer" class="btn btn-primary">
-                <span class="fas fa-plus"></span> Novo Cliente
-            </a>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Clientes</h4>
+    <a asp-action="CreateNewCustomer" class="btn btn-primary btn-sm">
+        <i class="fas fa-plus"></i> Novo Cliente
+    </a>
 </div>
 
-<br />
-
-<div class="panel panel-default">
-    <table class="table table-striped">
+<div class="card p-0">
+    <table class="table table-hover mb-0">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Email)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Phone)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Document)
-                </th>
-                <th></th>
+                <th class="ps-3">@Html.DisplayNameFor(model => model.Name)</th>
+                <th>@Html.DisplayNameFor(model => model.Email)</th>
+                <th>@Html.DisplayNameFor(model => model.Phone)</th>
+                <th>@Html.DisplayNameFor(model => model.Document)</th>
+                <th class="text-end pe-3" width="120"></th>
             </tr>
         </thead>
-
         <tbody>
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Phone)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Document)
-                    </td>
-
-                    <td>
-                        <a asp-action="UpdateCustomer"
-                           asp-route-id="@item.CustomerId"
-                           class="btn btn-warning"
-                           title="Editar">
-                            <span class="fas fa-edit"></span>
+                    <td class="ps-3">@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Document)</td>
+                    <td class="text-end pe-3">
+                        <a asp-action="UpdateCustomer" asp-route-id="@item.CustomerId" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
                         </a>
-
-                        <a asp-action="DeleteCustomer"
-                           asp-route-id="@item.CustomerId"
-                           class="btn btn-danger"
-                           title="Excluir">
-                            <span class="fas fa-trash-alt"></span>
+                        <a asp-action="DeleteCustomer" asp-route-id="@item.CustomerId" class="btn btn-sm btn-danger" title="Excluir">
+                            <i class="fas fa-trash-alt"></i>
                         </a>
                     </td>
                 </tr>

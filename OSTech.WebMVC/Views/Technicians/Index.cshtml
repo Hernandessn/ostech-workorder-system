@@ -1,88 +1,48 @@
 ﻿@model IEnumerable<TechnicianViewModel>
 
-<h2>Técnicos</h2>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="pull-left">
-            <a asp-action="CreateNewTechnician" class="btn btn-primary">
-                <span class="fas fa-plus"></span> Novo Técnico
-            </a>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Técnicos</h4>
+    <a asp-action="CreateNewTechnician" class="btn btn-primary btn-sm">
+        <i class="fas fa-plus"></i> Novo Técnico
+    </a>
 </div>
 
-<br />
-
-<div class="panel panel-default">
-    <table class="table table-striped">
+<div class="card p-0">
+    <table class="table table-hover mb-0">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Specialty)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contact)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Availability)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.HiringDate)
-                </th>
-                <th></th>
+                <th class="ps-3">@Html.DisplayNameFor(model => model.Name)</th>
+                <th>@Html.DisplayNameFor(model => model.Specialty)</th>
+                <th>@Html.DisplayNameFor(model => model.Contact)</th>
+                <th>@Html.DisplayNameFor(model => model.Availability)</th>
+                <th>@Html.DisplayNameFor(model => model.HiringDate)</th>
+                <th class="text-end pe-3" width="120"></th>
             </tr>
         </thead>
-
         <tbody>
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Specialty)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Contact)
-                    </td>
-
+                    <td class="ps-3">@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Contact)</td>
                     <td>
                         @if (item.Availability)
                         {
-                            <span class="badge bg-success">Disponível</span>
+                            <span class="badge badge-status-done">Disponível</span>
                         }
                         else
                         {
-                            <span class="badge bg-danger">Indisponível</span>
+                            <span class="badge badge-status-cancelled">Indisponível</span>
                         }
                     </td>
-
-                    <td>
-                        @item.HiringDate.ToString("dd/MM/yyyy")
-                    </td>
-
-                    <td>
-                        <a asp-action="UpdateTechnician"
-                           asp-route-id="@item.TechnicianId"
-                           class="btn btn-warning"
-                           title="Editar">
-                            <span class="fas fa-edit"></span>
+                    <td>@item.HiringDate.ToString("dd/MM/yyyy")</td>
+                    <td class="text-end pe-3">
+                        <a asp-action="UpdateTechnician" asp-route-id="@item.TechnicianId" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
                         </a>
-
-                        <a asp-action="DeleteTechnician"
-                           asp-route-id="@item.TechnicianId"
-                           class="btn btn-danger"
-                           title="Excluir">
-                            <span class="fas fa-trash-alt"></span>
+                        <a asp-action="DeleteTechnician" asp-route-id="@item.TechnicianId" class="btn btn-sm btn-danger" title="Excluir">
+                            <i class="fas fa-trash-alt"></i>
                         </a>
                     </td>
                 </tr>
