@@ -1,0 +1,115 @@
+﻿@model WorkOrderViewModel
+
+<h2>Criar Ordem de Serviço</h2>
+
+<hr />
+
+<form asp-action="CreateNewWorkOrder">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Title" class="control-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="OpeningDate" class="control-label"></label>
+                <input asp-for="OpeningDate" type="date" class="form-control" />
+                <span asp-validation-for="OpeningDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Deadline" class="control-label"></label>
+                <input asp-for="Deadline" type="date" class="form-control" />
+                <span asp-validation-for="Deadline" class="text-danger"></span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Status" class="control-label"></label>
+        <select asp-for="Status"
+                asp-items="Html.GetEnumSelectList<StatusWorkOrder>()"
+                class="form-control">
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TechnicianId" class="control-label"></label>
+        <select asp-for="TechnicianId"
+                asp-items="Model.Technicians"
+                class="form-control">
+            <option value="">Selecione um Técnico</option>
+        </select>
+        <span asp-validation-for="TechnicianId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CustomerId" class="control-label"></label>
+        <select asp-for="CustomerId"
+                asp-items="Model.Customers"
+                class="form-control">
+            <option value="">Selecione um Cliente</option>
+        </select>
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CategoryId" class="control-label"></label>
+        <select asp-for="CategoryId"
+                asp-items="Model.Categories"
+                class="form-control">
+            <option value="">Selecione uma Categoria</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EquipmentId" class="control-label"></label>
+        <select asp-for="EquipmentId"
+                asp-items="Model.Equipments"
+                class="form-control">
+            <option value="">Selecione um Equipamento</option>
+        </select>
+        <span asp-validation-for="EquipmentId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Criar" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary">Retornar</a>
+    </div>
+
+    @if (ViewBag.Erro != null)
+    {
+        <div class="text-danger mt-3">
+            <h5>@ViewBag.Erro</h5>
+        </div>
+    }
+</form>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

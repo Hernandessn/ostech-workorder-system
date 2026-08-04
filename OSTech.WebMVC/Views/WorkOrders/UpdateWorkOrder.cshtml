@@ -1,0 +1,107 @@
+﻿@model WorkOrderViewModel
+
+<h2>Atualizar Ordem de Serviço</h2>
+
+<hr />
+
+<form asp-action="UpdateWorkOrder">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="WorkOrderId" />
+
+    <div class="form-group">
+        <label asp-for="Title" class="control-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Description" class="control-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Amount" class="control-label"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="row mt-2">
+
+        <div class="col-md-6">
+            <label asp-for="OpeningDate" class="control-label"></label>
+            <input asp-for="OpeningDate" type="date" class="form-control" />
+            <span asp-validation-for="OpeningDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Deadline" class="control-label"></label>
+            <input asp-for="Deadline" type="date" class="form-control" />
+            <span asp-validation-for="Deadline" class="text-danger"></span>
+        </div>
+
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Status" class="control-label"></label>
+        <select asp-for="Status" class="form-control">
+            @foreach (var status in Enum.GetValues(typeof(StatusWorkOrder)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="TechnicianId"></label>
+        <select asp-for="TechnicianId"
+                asp-items="Model.Technicians"
+                class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="CustomerId"></label>
+        <select asp-for="CustomerId"
+                asp-items="Model.Customers"
+                class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="CategoryId"></label>
+        <select asp-for="CategoryId"
+                asp-items="Model.Categories"
+                class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="EquipmentId"></label>
+        <select asp-for="EquipmentId"
+                asp-items="Model.Equipments"
+                class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Salvar" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Retornar</a>
+    </div>
+
+    @if (ViewBag.Erro != null)
+    {
+        <div class="text-danger mt-3">
+            <h5>@ViewBag.Erro</h5>
+        </div>
+    }
+
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

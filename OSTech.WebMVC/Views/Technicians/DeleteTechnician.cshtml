@@ -1,0 +1,62 @@
+﻿@model TechnicianViewModel
+
+<h3>Deletar Técnico</h3>
+
+<h4>Confirma a exclusão deste Técnico?</h4>
+
+<div>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Specialty)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Specialty)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contact)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contact)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Availability)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Availability)
+            {
+                <span class="badge bg-success">Disponível</span>
+            }
+            else
+            {
+                <span class="badge bg-danger">Indisponível</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.HiringDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.HiringDate.ToString("dd/MM/yyyy")
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteTechnician">
+        <input type="hidden" asp-for="TechnicianId" />
+
+        <div class="form-group" style="padding-top:10px">
+            <input type="submit" value="Deletar" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-info">Retornar</a>
+        </div>
+    </form>
+</div>
