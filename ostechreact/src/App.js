@@ -1,6 +1,7 @@
-import './App.css';
+import React from 'react';
+import './Global.css';
 
-function App() {
+export function App() {
   return (
     <div className="App">
       OSTech
@@ -8,4 +9,3 @@ function App() {
   );
 }
 
-export default App;
