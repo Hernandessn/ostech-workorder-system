@@ -20,18 +20,6 @@ export const Category = () => {
     const [modalDelete, setModalDelete] = useState(false);
     const [modalEdit, setModalEdit] = useState(false);
 
-    // Abrir ou fechar modal para adicionar
-    const openCloseAddModal = () => {
-        setModalAdd(!modalAdd);
-    }
-    const openCloseDeleteModal = () => {
-        setModalDelete(!modalDelete);
-    }
-
-    const openCloseEditModal = () => {
-        setModalEdit(!modalEdit);
-    }
-
     const handleChange = e => {
         const { name, value } = e.target;
         setCategorySelected({
@@ -183,7 +171,7 @@ export const Category = () => {
                 modalClassName="category-modal-fade"
                 backdropClassName="category-modal-backdrop"
             >
-                <ModalHeader toggle={openCloseAddModal}>Create category</ModalHeader>
+                <ModalHeader toggle={()=>setModalAdd(true)}>Create category</ModalHeader>
                 <ModalBody>
                     <div className='form-group'>
                         <label htmlFor="cat-name">Name: </label>
