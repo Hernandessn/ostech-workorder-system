@@ -1,0 +1,291 @@
+.equipment-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    color: var(--text-primary);
+    background: var(--bg-body);
+    min-height: 100vh;
+}
+
+/* Header */
+.equipment-container header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.equipment-container header img {
+    height: 48px;
+    width: auto;
+}
+
+.equipment-container header h2 {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.equipment-container header h2 strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Title row */
+.equipment-container > .equipment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.equipment-container h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.equipment-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.6rem 1.1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #ffffff;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+.equipment-button:hover {
+    background: var(--accent-hover);
+}
+
+/* List */
+.equipment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.equipment-list .equipment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.equipment-list .equipment-item:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    border-color: var(--border-color-hover);
+}
+
+.equipment-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.15rem 1.5rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.equipment-name {
+    grid-column: 1 / -1;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.equipment-brand,
+.equipment-modal,
+.equipment-serialNumber {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.equipment-brand::before {
+    content: "Brand: ";
+    color: #565c68;
+}
+
+.equipment-modal::before {
+    content: "Model: ";
+    color: #565c68;
+}
+
+.equipment-serialNumber::before {
+    content: "S/N: ";
+    color: #565c68;
+}
+
+/* Actions */
+.equipment-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.equipment-modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.equipment-modal-backdrop.fade {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.equipment-modal-backdrop.show {
+    opacity: 1;
+}
+
+.equipment-modal-fade .modal-dialog {
+    transform: scale(0.92) translateY(-10px);
+    opacity: 0;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.18s ease;
+}
+
+.equipment-modal-fade.show .modal-dialog {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.equipment-modal-fade .modal-content {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.equipment-modal-fade .modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.1rem 1.25rem;
+}
+
+.equipment-modal-fade .modal-title,
+.equipment-modal-fade .modal-header {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.equipment-modal-fade .modal-header .btn-close {
+    filter: invert(1) grayscale(1) brightness(1.8);
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.equipment-modal-fade .modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.equipment-modal-fade .modal-body {
+    padding: 1.25rem;
+}
+
+.equipment-modal-fade .modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+}
+
+.equipment-modal-fade .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+    margin-top: 0.9rem;
+}
+
+.equipment-modal-fade .form-control {
+    background: var(--bg-body);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.equipment-modal-fade .form-control:focus {
+    background: var(--bg-body);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+    outline: none;
+}
+
+.equipment-modal-fade .form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+.equipment-modal-fade .btn-primary {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.1rem;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.equipment-modal-fade .btn-primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.equipment-modal-fade .btn-primary:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.equipment-modal-fade .btn-primary:disabled {
+    background: #1e3a8a;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.equipment-modal-fade .btn-danger {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    padding: 0.5rem 1.1rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.equipment-modal-fade .btn-danger:hover {
+    background: #2a1a1a;
+    color: var(--danger);
+    border-color: #3a2222;
+}
+
+
+/* Responsive */
+@media (max-width: 560px) {
+    .equipment-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .equipment-container {
+        padding: 1.25rem 1rem;
+    }
+
+    .equipment-list .equipment-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .equipment-actions {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+}

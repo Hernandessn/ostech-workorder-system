@@ -171,10 +171,10 @@ export const Customer = () => {
                 isOpen={modalAdd}
                 toggle={() => setModalAdd(false)}
                 centered
-                modalClassName="category-modal-fade"
-                backdropClassName="category-modal-backdrop"
+                modalClassName="customer-modal-fade"
+                backdropClassName="customer-modal-backdrop"
             >
-                <ModalHeader toggle={() => setModalAdd(true)}>Create customer</ModalHeader>
+                <ModalHeader toggle={() => setModalAdd(false)}>Create customer</ModalHeader>
                 <ModalBody>
                     <div className='form-group'>
                         <label htmlFor="cust-name">Name</label>
@@ -239,8 +239,8 @@ export const Customer = () => {
                 isOpen={modalEdit}
                 toggle={() => setModalEdit(false)}
                 centered
-                modalClassName="category-modal-fade"
-                backdropClassName="category-modal-backdrop"
+                modalClassName="customer-modal-fade"
+                backdropClassName="customer-modal-backdrop"
             >
                 <ModalHeader toggle={() => setModalEdit(false)}>Edit Customer</ModalHeader>
                 <ModalBody>
@@ -308,8 +308,8 @@ export const Customer = () => {
                 isOpen={modalDelete}
                 toggle={() => setModalDelete(false)}
                 centered
-                modalClassName="category-modal-fade"
-                backdropClassName="category-modal-backdrop"
+                modalClassName="customer-modal-fade"
+                backdropClassName="customer-modal-backdrop"
             >
                 <ModalHeader toggle={() => setModalDelete(false)}>Delete customer</ModalHeader>
                 <ModalBody>

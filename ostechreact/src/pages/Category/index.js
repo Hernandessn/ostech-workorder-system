@@ -171,7 +171,7 @@ export const Category = () => {
                 modalClassName="category-modal-fade"
                 backdropClassName="category-modal-backdrop"
             >
-                <ModalHeader toggle={()=>setModalAdd(true)}>Create category</ModalHeader>
+                <ModalHeader toggle={()=>setModalAdd(false)}>Create category</ModalHeader>
                 <ModalBody>
                     <div className='form-group'>
                         <label htmlFor="cat-name">Name: </label>
