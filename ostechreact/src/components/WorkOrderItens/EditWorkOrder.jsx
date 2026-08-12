@@ -1,7 +1,13 @@
 import { Modal } from '../Modal';
 
+const selectClass = "rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA] appearance-none";
+
 export const EditWorkOrder = ({
     workOrder,
+    customers,
+    technicians,
+    categories,
+    equipments,
     isOpen,
     onClose,
     onChange,
@@ -9,7 +15,7 @@ export const EditWorkOrder = ({
     onSubmit
 }) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Edit workOrder">
+        <Modal isOpen={isOpen} onClose={onClose} title="Edit WorkOrder">
             <div className="flex flex-col gap-3">
                 <label htmlFor="edit-id" className="text-sm font-medium">ID</label>
                 <input
@@ -20,12 +26,12 @@ export const EditWorkOrder = ({
                     className="rounded-md bg-[#021526]/60 border border-[#6EACDA]/20 px-3 py-2 text-[#E2E2B6]/70 cursor-not-allowed"
                 />
 
-                <label htmlFor="edit-name" className="text-sm font-medium">Name:</label>
+                <label htmlFor="edit-title" className="text-sm font-medium">Title:</label>
                 <input
-                    id="edit-name"
+                    id="edit-title"
                     type="text"
-                    name="name"
-                    value={workOrder ? workOrder.name : ''}
+                    name="title"
+                    value={workOrder ? workOrder.title : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
@@ -39,61 +45,102 @@ export const EditWorkOrder = ({
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
+
                 <label htmlFor="edit-amount" className="text-sm font-medium">Amount:</label>
                 <input
                     id="edit-amount"
-                    type="text"
+                    type="number"
                     name="amount"
                     value={workOrder ? workOrder.amount : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
+
                 <label htmlFor="edit-deadline" className="text-sm font-medium">Deadline:</label>
                 <input
                     id="edit-deadline"
-                    type="text"
+                    type="date"
                     name="deadline"
                     value={workOrder ? workOrder.deadline : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
+
                 <label htmlFor="edit-openingDate" className="text-sm font-medium">Opening Date:</label>
                 <input
                     id="edit-openingDate"
-                    type="text"
+                    type="date"
                     name="openingDate"
                     value={workOrder ? workOrder.openingDate : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="edit-customerId" className="text-sm font-medium">Customer ID:</label>
-                <input
+
+                <label htmlFor="edit-customerId" className="text-sm font-medium">Customer:</label>
+                <select
                     id="edit-customerId"
-                    type="text"
-                    name="name"
+                    name="customerId"
                     value={workOrder ? workOrder.customerId : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
-                />
-                <label htmlFor="edit-categoryId" className="text-sm font-medium">Category ID:</label>
-                <input
+                    className={selectClass}
+                >
+                    <option value="">Select a customer</option>
+                    {customers.map(customer => (
+                        <option key={customer.customerId} value={customer.customerId}>
+                            {customer.name}
+                        </option>
+                    ))}
+                </select>
+
+                <label htmlFor="edit-categoryId" className="text-sm font-medium">Category:</label>
+                <select
                     id="edit-categoryId"
-                    type="text"
-                    name="name"
+                    name="categoryId"
                     value={workOrder ? workOrder.categoryId : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
-                />
-                <label htmlFor="edit-equipmentId" className="text-sm font-medium">Equipment ID:</label>
-                <input
+                    className={selectClass}
+                >
+                    <option value="">Select a category</option>
+                    {categories.map(category => (
+                        <option key={category.categoryId} value={category.categoryId}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+
+                <label htmlFor="edit-equipmentId" className="text-sm font-medium">Equipment:</label>
+                <select
                     id="edit-equipmentId"
-                    type="text"
-                    name="name"
+                    name="equipmentId"
                     value={workOrder ? workOrder.equipmentId : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
-                />
+                    className={selectClass}
+                >
+                    <option value="">Select an equipment</option>
+                    {equipments.map(equipment => (
+                        <option key={equipment.equipmentId} value={equipment.equipmentId}>
+                            {equipment.name}
+                        </option>
+                    ))}
+                </select>
+
+                <label htmlFor="edit-technicianId" className="text-sm font-medium">Technician:</label>
+                <select
+                    id="edit-technicianId"
+                    name="technicianId"
+                    value={workOrder ? workOrder.technicianId : ''}
+                    onChange={onChange}
+                    className={selectClass}
+                >
+                    <option value="">Select a technician</option>
+                    {technicians.map(technician => (
+                        <option key={technician.technicianId} value={technician.technicianId}>
+                            {technician.name}
+                        </option>
+                    ))}
+                </select>
             </div>
+
             <div className="flex justify-end gap-2 mt-4">
                 <button
                     onClick={onSubmit}

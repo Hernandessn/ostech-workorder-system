@@ -36,6 +36,10 @@ export const WorkOrderList = ({ workOrder, onEdit, onDelete }) => {
                     <span className="font-semibold text-[#6EACDA]">Equipment ID: </span>
                     {workOrder.equipmentId}
                 </p>
+                 <p className="font-medium">
+                    <span className="font-semibold text-[#6EACDA]">Technician ID: </span>
+                    {workOrder.technicianId}
+                </p>
             </div>
             <ActionsButtons onEdit={onEdit} onDelete={onDelete} />
         </li>

@@ -19,6 +19,12 @@ export const WorkOrder = () => {
 
     const [workOrder, setWorkOrder] = useState([]);
 
+    const [technicians, setTechnicians] = useState([]);
+    const [customers, setCustomers] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [equipments, setEquipments] = useState([]);
+
+
     const [workOrderSelected, setWorkOrderSelected] = useState({
         title: '',
         description: '',
@@ -157,7 +163,21 @@ export const WorkOrder = () => {
             setIsSubmitting(false);
         }
     }
-
+    useEffect(() => {
+        const loadOptions = async () => {
+            const [techRes, custRes, catRes, equipRes] = await Promise.all([
+                api.get('/technician'),
+                api.get('/customer'),
+                api.get('/category'),
+                api.get('/equipment'),
+            ]);
+            setTechnicians(techRes.data);
+            setCustomers(custRes.data);
+            setCategories(catRes.data);
+            setEquipments(equipRes.data);
+        };
+        loadOptions();
+    }, []);
     useEffect(() => {
         getWorkOrder();
     }, [])
@@ -211,6 +231,10 @@ export const WorkOrder = () => {
 
                     <CreateWorkOrder
                         workOrder={workOrderSelected}
+                        technicians={technicians}
+                        customers={customers}
+                        categories={categories}
+                        equipments={equipments}
                         isOpen={modalAdd}
                         onClose={() => setModalAdd(false)}
                         isSubmitting={isSubmitting}
@@ -220,12 +244,15 @@ export const WorkOrder = () => {
 
                     <EditWorkOrder
                         workOrder={workOrderSelected}
+                        technicians={technicians}
+                        customers={customers}
+                        categories={categories}
+                        equipments={equipments}
                         isOpen={modalEdit}
                         onClose={() => setModalEdit(false)}
-                        isSubmitting={isSubmitting}
                         onChange={handleChange}
+                        isSubmitting={isSubmitting}
                         onSubmit={putWorkOrder}
-
                     />
                     <DeleteWorkOrder
                         workOrder={workOrderSelected}
