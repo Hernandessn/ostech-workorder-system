@@ -13,6 +13,7 @@ import { CustomerList, CreateCustomer, EditCustomer, DeleteCustomer } from '../.
 import { Header } from '../../components/Header';
 
 import { toast } from 'react-toastify';
+import { validateCustomer } from '../../validations/customerValidation';
 
 
 export const Customer = () => {
@@ -20,6 +21,7 @@ export const Customer = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [errors, setErrors] = useState({});
     const [isEmpty, setIsEmpty] = useState([]);
 
     const [customerSelected, setCustomerSelected] = useState({
@@ -71,9 +73,16 @@ export const Customer = () => {
         }
     }
     const postCustomer = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateCustomer(customerSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.post('/customer', {
                 name: customerSelected.name,
                 email: customerSelected.email,
@@ -87,7 +96,6 @@ export const Customer = () => {
             toast.success("Cliente criado com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Error ao criar cliente!");
         } finally {
             setIsSubmitting(false);
@@ -95,10 +103,15 @@ export const Customer = () => {
     }
 
     const putCustomer = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
-
         try {
+            const validationErrors = validateCustomer(customerSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
+            setIsSubmitting(true);
             const response = await api.put(
                 `/customer/${customerSelected.customerId}`,
                 customerSelected
@@ -117,7 +130,6 @@ export const Customer = () => {
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao atualizar cliente!");
         } finally {
             setIsSubmitting(false);
@@ -125,7 +137,6 @@ export const Customer = () => {
     };
 
     const deleteCustomer = async () => {
-        setIsError(false);
         setIsSubmitting(true);
         try {
             const response = await api.delete(`/customer/${customerSelected.customerId}`);
@@ -142,7 +153,6 @@ export const Customer = () => {
             toast.success("Cliente deletedo com sucesso!");
         } catch (error) {
             console.log(error)
-            setModalDelete(true);
             toast.error("Erro ao deletar cliente!");
         } finally {
             setIsSubmitting(false);
@@ -167,6 +177,7 @@ export const Customer = () => {
                         entity="Customer"
                         onCreate={() => {
                             clearCustomerSelected();
+                            setErrors({});
                             setModalAdd(true);
                         }}
                     />
@@ -180,6 +191,7 @@ export const Customer = () => {
                             entity="Customer"
                             onCreate={() => {
                                 clearCustomerSelected();
+                                setErrors({});
                                 setModalAdd(true);
                             }} />
                     </div>
@@ -205,7 +217,7 @@ export const Customer = () => {
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postCustomer}
-
+                        errors={errors}
                     />
                     <EditCustomer
                         customer={customerSelected}
@@ -214,7 +226,7 @@ export const Customer = () => {
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={putCustomer}
-
+                        errors={errors}
                     />
                     <DeleteCustomer
                         customer={customerSelected}

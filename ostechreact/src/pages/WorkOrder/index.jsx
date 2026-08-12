@@ -9,12 +9,14 @@ import { CreateButton } from '../../components/Buttons/CreateButton';
 import { Header } from '../../components/Header';
 import { WorkOrderList, CreateWorkOrder, EditWorkOrder, DeleteWorkOrder } from '../../components/WorkOrderItens';
 import { EmptyState } from '../../components/EmptyState';
+import { validateWorkOrder } from '../../validations/workOrderValidation';
 
 export const WorkOrder = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [errors, setErrors] = useState({});
     const [isEmpty, setIsEmpty] = useState([]);
 
     const [workOrder, setWorkOrder] = useState([]);
@@ -86,8 +88,18 @@ export const WorkOrder = () => {
     }
 
     const postWorkOrder = async () => {
-        setIsError(false);
         try {
+            const validationErrors = validateWorkOrder(workOrderSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+
+            setErrors({});
+            setIsSubmitting(true);
+
+
             const response = await api.post('/workorder', {
                 title: workOrderSelected.title,
                 description: workOrderSelected.description,
@@ -108,7 +120,6 @@ export const WorkOrder = () => {
             toast.success("Ordem de serviço criada com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao criar ordem de serviço!");
         } finally {
             setIsSubmitting(false);
@@ -116,9 +127,17 @@ export const WorkOrder = () => {
     }
 
     const putWorkOrder = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateWorkOrder(workOrderSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.put(`/workorder/${workOrderSelected.workOrderId}`, workOrderSelected);
 
             setWorkOrder(prev =>
@@ -134,7 +153,6 @@ export const WorkOrder = () => {
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao atualizar ordem de serviço!");
         } finally {
             setIsSubmitting(false);
@@ -142,7 +160,6 @@ export const WorkOrder = () => {
     }
 
     const deleteWorkOrder = async () => {
-        setIsError(false);
         setIsSubmitting(true);
         try {
             const response = await api.delete(`/workOrder/${workOrderSelected.workOrderId}`);
@@ -195,6 +212,7 @@ export const WorkOrder = () => {
                         entity="WorkOrder"
                         onCreate={() => {
                             clearWorkOrderSelected();
+                            setErrors({});
                             setModalAdd(true);
                         }}
                     />
@@ -209,6 +227,7 @@ export const WorkOrder = () => {
                             entity="WorkOrder"
                             onCreate={() => {
                                 clearWorkOrderSelected();
+                                setErrors({});
                                 setModalAdd(true);
                             }} />
                     </div>
@@ -240,6 +259,7 @@ export const WorkOrder = () => {
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postWorkOrder}
+                        errors={errors}
                     />
 
                     <EditWorkOrder
@@ -253,6 +273,7 @@ export const WorkOrder = () => {
                         onChange={handleChange}
                         isSubmitting={isSubmitting}
                         onSubmit={putWorkOrder}
+                        errors={errors}
                     />
                     <DeleteWorkOrder
                         workOrder={workOrderSelected}

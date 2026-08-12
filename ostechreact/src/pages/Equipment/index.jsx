@@ -9,12 +9,14 @@ import { CreateButton } from '../../components/Buttons/CreateButton';
 import { Header } from '../../components/Header';
 
 import { EquipmentList, CreateEquipment, EditEquipment, DeleteEquipment } from '../../components/EquipmentItens';
+import { validateEquipment } from '../../validations/equipmentValidation';
 
 export const Equipment = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [errors, setErrors] = useState({});
     const [isEmpty, setIsEmpty] = useState([]);
 
     const [equipmentSelected, setEquipmentSelected] = useState({
@@ -67,9 +69,16 @@ export const Equipment = () => {
     }
 
     const postEquipment = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateEquipment(equipmentSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.post('/equipment', {
                 name: equipmentSelected.name,
                 brand: equipmentSelected.brand,
@@ -83,7 +92,6 @@ export const Equipment = () => {
             toast.success("Equipamento criado com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao criar equipamento!");
         } finally {
             setIsSubmitting(false);
@@ -91,9 +99,17 @@ export const Equipment = () => {
     }
 
     const putEquipment = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateEquipment(equipmentSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.put(`/equipment/${equipmentSelected.equipmentId}`, equipmentSelected);
 
             setEquipment(prev =>
@@ -109,7 +125,6 @@ export const Equipment = () => {
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao atualizar equipamento!");
         } finally {
             setIsSubmitting(false);
@@ -118,7 +133,6 @@ export const Equipment = () => {
 
 
     const deleteEquipment = async () => {
-        setIsError(false);
         setIsSubmitting(true);
         try {
             const response = await api.delete(`equipment/${equipmentSelected.equipmentId}`);
@@ -135,7 +149,6 @@ export const Equipment = () => {
             toast.success("Equipamento deletado com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao deletar equipamento");
         } finally {
             setIsSubmitting(false);
@@ -159,6 +172,7 @@ export const Equipment = () => {
                         entity="Equipment"
                         onCreate={() => {
                             clearEquipmentSelected()
+                            setErrors({});
                             setModalAdd(true)
                         }}
                     />
@@ -172,6 +186,7 @@ export const Equipment = () => {
                             entity="Equipment"
                             onCreate={() => {
                                 clearEquipmentSelected()
+                                setErrors({});
                                 setModalAdd(true)
                             }}
                         />
@@ -199,6 +214,7 @@ export const Equipment = () => {
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postEquipment}
+                        errors={errors}
                     />
                     <EditEquipment
                         equipment={equipmentSelected}
@@ -207,6 +223,7 @@ export const Equipment = () => {
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={putEquipment}
+                        errors={errors}
                     />
                     <DeleteEquipment
                         equipment={equipmentSelected}

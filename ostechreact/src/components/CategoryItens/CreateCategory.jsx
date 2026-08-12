@@ -1,12 +1,21 @@
 import { Modal } from '../Modal';
 
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
+
 export const CreateCategory = ({
     category,
     isOpen,
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Create category">
@@ -19,8 +28,9 @@ export const CreateCategory = ({
                     value={category.name}
                     onChange={onChange}
                     autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.name)}
                 />
+                <ErrorText message={errors.name} />
 
                 <label htmlFor="cat-desc" className="text-sm font-medium">Description:</label>
                 <textarea
@@ -29,8 +39,9 @@ export const CreateCategory = ({
                     rows={3}
                     value={category.description}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.description)}
                 />
+                <ErrorText message={errors.description} />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
@@ -41,7 +52,6 @@ export const CreateCategory = ({
                 >
                     {isSubmitting ? 'Adding...' : 'Add'}
                 </button>
-
                 <button
                     onClick={onClose}
                     className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"

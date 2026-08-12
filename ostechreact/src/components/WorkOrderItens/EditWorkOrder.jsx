@@ -1,6 +1,17 @@
 import { Modal } from '../Modal';
 
-const selectClass = "rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA] appearance-none";
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const selectClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none appearance-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
 
 export const EditWorkOrder = ({
     workOrder,
@@ -12,7 +23,8 @@ export const EditWorkOrder = ({
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Edit WorkOrder">
@@ -33,8 +45,9 @@ export const EditWorkOrder = ({
                     name="title"
                     value={workOrder ? workOrder.title : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.title)}
                 />
+                <ErrorText message={errors.title} />
 
                 <label htmlFor="edit-description" className="text-sm font-medium">Description:</label>
                 <input
@@ -43,8 +56,9 @@ export const EditWorkOrder = ({
                     name="description"
                     value={workOrder ? workOrder.description : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.description)}
                 />
+                <ErrorText message={errors.description} />
 
                 <label htmlFor="edit-amount" className="text-sm font-medium">Amount:</label>
                 <input
@@ -53,8 +67,9 @@ export const EditWorkOrder = ({
                     name="amount"
                     value={workOrder ? workOrder.amount : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.amount)}
                 />
+                <ErrorText message={errors.amount} />
 
                 <label htmlFor="edit-deadline" className="text-sm font-medium">Deadline:</label>
                 <input
@@ -63,8 +78,9 @@ export const EditWorkOrder = ({
                     name="deadline"
                     value={workOrder ? workOrder.deadline : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.deadline)}
                 />
+                <ErrorText message={errors.deadline} />
 
                 <label htmlFor="edit-openingDate" className="text-sm font-medium">Opening Date:</label>
                 <input
@@ -73,8 +89,9 @@ export const EditWorkOrder = ({
                     name="openingDate"
                     value={workOrder ? workOrder.openingDate : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.openingDate)}
                 />
+                <ErrorText message={errors.openingDate} />
 
                 <label htmlFor="edit-customerId" className="text-sm font-medium">Customer:</label>
                 <select
@@ -82,7 +99,7 @@ export const EditWorkOrder = ({
                     name="customerId"
                     value={workOrder ? workOrder.customerId : ''}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.customerId)}
                 >
                     <option value="">Select a customer</option>
                     {customers.map(customer => (
@@ -91,6 +108,7 @@ export const EditWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.customerId} />
 
                 <label htmlFor="edit-categoryId" className="text-sm font-medium">Category:</label>
                 <select
@@ -98,7 +116,7 @@ export const EditWorkOrder = ({
                     name="categoryId"
                     value={workOrder ? workOrder.categoryId : ''}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.categoryId)}
                 >
                     <option value="">Select a category</option>
                     {categories.map(category => (
@@ -107,6 +125,7 @@ export const EditWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.categoryId} />
 
                 <label htmlFor="edit-equipmentId" className="text-sm font-medium">Equipment:</label>
                 <select
@@ -114,7 +133,7 @@ export const EditWorkOrder = ({
                     name="equipmentId"
                     value={workOrder ? workOrder.equipmentId : ''}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.equipmentId)}
                 >
                     <option value="">Select an equipment</option>
                     {equipments.map(equipment => (
@@ -123,6 +142,7 @@ export const EditWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.equipmentId} />
 
                 <label htmlFor="edit-technicianId" className="text-sm font-medium">Technician:</label>
                 <select
@@ -130,7 +150,7 @@ export const EditWorkOrder = ({
                     name="technicianId"
                     value={workOrder ? workOrder.technicianId : ''}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.technicianId)}
                 >
                     <option value="">Select a technician</option>
                     {technicians.map(technician => (
@@ -139,6 +159,7 @@ export const EditWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.technicianId} />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">

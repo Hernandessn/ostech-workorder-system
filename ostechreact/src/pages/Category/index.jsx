@@ -12,11 +12,13 @@ import { Container } from '../../components/Container';
 import { Header } from '../../components/Header';
 
 import { toast } from 'react-toastify';
+import { validateCategory } from '../../validations/categoryValidation';
 
 export const Category = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const [categorySelected, setCategorySelected] = useState({
         categoryId: '',
@@ -64,8 +66,14 @@ export const Category = () => {
     };
 
     const postCategory = async () => {
-        setIsError(false);
         try {
+            const validationErrors = validateCategory(categorySelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
             setIsSubmitting(true);
 
             const response = await api.post('/category', {
@@ -86,7 +94,6 @@ export const Category = () => {
             toast.success("Categoria criada com sucesso!")
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao criar a categoria!");
         } finally {
             setIsSubmitting(false);
@@ -94,9 +101,16 @@ export const Category = () => {
     };
 
     const putCategory = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateCategory(categorySelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.put(
                 `/category/${categorySelected.categoryId}`,
                 categorySelected
@@ -114,14 +128,12 @@ export const Category = () => {
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao atualizar categoria!");
         } finally {
             setIsSubmitting(false);
         }
     };
     const deleteCategory = async () => {
-        setIsError(false);
         setIsSubmitting(true);
         try {
             await api.delete(
@@ -139,7 +151,6 @@ export const Category = () => {
             toast.success("Categoria deletada com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao deletar categoria!")
         } finally {
             setIsSubmitting(false)
@@ -168,6 +179,7 @@ export const Category = () => {
                                     entity="Category"
                                     onCreate={() => {
                                         clearCategorySelected()
+                                        setErrors({});
                                         setModalAdd(true)
                                     }}
                                 />
@@ -181,6 +193,7 @@ export const Category = () => {
                                         entity="Category"
                                         onCreate={() => {
                                             clearCategorySelected()
+                                            setErrors({});
                                             setModalAdd(true)
                                         }}
                                     />
@@ -207,6 +220,7 @@ export const Category = () => {
                                     onChange={handleChange}
                                     isSubmitting={isSubmitting}
                                     onSubmit={postCategory}
+                                    errors={errors}
                                 />
                                 <EditCategory
                                     category={categorySelected}
@@ -215,6 +229,7 @@ export const Category = () => {
                                     onChange={handleChange}
                                     isSubmitting={isSubmitting}
                                     onSubmit={putCategory}
+                                    errors={errors}
                                 />
                                 <DeleteCategory
                                     category={categorySelected}

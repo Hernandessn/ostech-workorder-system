@@ -1,12 +1,21 @@
 import { Modal } from '../Modal';
 
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
+
 export const CreateEquipment = ({
     equipment,
     isOpen,
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Create equipment">
@@ -19,8 +28,10 @@ export const CreateEquipment = ({
                     value={equipment.name}
                     onChange={onChange}
                     autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.name)}
                 />
+                <ErrorText message={errors.name} />
+
                 <label htmlFor="cat-brand" className="text-sm font-medium">Brand:</label>
                 <input
                     id="cat-brand"
@@ -28,9 +39,10 @@ export const CreateEquipment = ({
                     name="brand"
                     value={equipment.brand}
                     onChange={onChange}
-                    autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.brand)}
                 />
+                <ErrorText message={errors.brand} />
+
                 <label htmlFor="cat-model" className="text-sm font-medium">Model:</label>
                 <input
                     id="cat-model"
@@ -38,9 +50,10 @@ export const CreateEquipment = ({
                     name="model"
                     value={equipment.model}
                     onChange={onChange}
-                    autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.model)}
                 />
+                <ErrorText message={errors.model} />
+
                 <label htmlFor="cat-serialNumber" className="text-sm font-medium">Serial Number:</label>
                 <input
                     id="cat-serialNumber"
@@ -48,9 +61,9 @@ export const CreateEquipment = ({
                     name="serialNumber"
                     value={equipment.serialNumber}
                     onChange={onChange}
-                    autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.serialNumber)}
                 />
+                <ErrorText message={errors.serialNumber} />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
@@ -61,7 +74,6 @@ export const CreateEquipment = ({
                 >
                     {isSubmitting ? 'Adding...' : 'Add'}
                 </button>
-
                 <button
                     onClick={onClose}
                     className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"

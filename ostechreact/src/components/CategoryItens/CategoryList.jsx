@@ -8,7 +8,7 @@ export const CategoryList = ({ category, onEdit, onDelete }) => {
                     <span className="font-semibold text-[#6EACDA]">Name: </span>
                     {category.name}
                 </p>
-                <p className="text-sm text-[#6EACDA]">
+                <p className="text-sm">
                     <span className="font-semibold text-[#6EACDA]">Description: </span>
                     {category.description}
                 </p>

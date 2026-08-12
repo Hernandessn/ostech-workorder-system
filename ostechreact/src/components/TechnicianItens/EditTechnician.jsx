@@ -1,12 +1,21 @@
 import { Modal } from '../Modal';
 
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
+
 export const EditTechnician = ({
     technician,
     isOpen,
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Edit Technician">
@@ -27,8 +36,9 @@ export const EditTechnician = ({
                     name="name"
                     value={technician ? technician.name : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.name)}
                 />
+                <ErrorText message={errors.name} />
 
                 <label htmlFor="edit-specialty" className="text-sm font-medium">Specialty:</label>
                 <input
@@ -37,8 +47,10 @@ export const EditTechnician = ({
                     name="specialty"
                     value={technician ? technician.specialty : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.specialty)}
                 />
+                <ErrorText message={errors.specialty} />
+
                 <label htmlFor="edit-contact" className="text-sm font-medium">Contact:</label>
                 <input
                     id="edit-contact"
@@ -46,31 +58,37 @@ export const EditTechnician = ({
                     name="contact"
                     value={technician ? technician.contact : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.contact)}
                 />
+                <ErrorText message={errors.contact} />
+
                 <label htmlFor="edit-availability" className="text-sm font-medium">Availability:</label>
                 <select
-                    id="cat-availability"
+                    id="edit-availability"
                     name="availability"
-                    value={technician.availability ? 'true' : 'false'}
+                    value={technician && technician.availability ? 'true' : 'false'}
                     onChange={(e) => onChange({
                         target: { name: 'availability', value: e.target.value }
                     })}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.availability)}
                 >
                     <option value="true">Available</option>
                     <option value="false">Unavailable</option>
                 </select>
+                <ErrorText message={errors.availability} />
+
                 <label htmlFor="edit-hiringDate" className="text-sm font-medium">Hiring Date:</label>
                 <input
                     id="edit-hiringDate"
-                    type="text"
+                    type="date"
                     name="hiringDate"
                     value={technician ? technician.hiringDate : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.hiringDate)}
                 />
+                <ErrorText message={errors.hiringDate} />
             </div>
+
             <div className="flex justify-end gap-2 mt-4">
                 <button
                     onClick={onSubmit}

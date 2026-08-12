@@ -1,12 +1,21 @@
 import { Modal } from '../Modal';
 
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
+
 export const EditCategory = ({
     category,
     isOpen,
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Edit Category">
@@ -27,8 +36,9 @@ export const EditCategory = ({
                     name="name"
                     value={category ? category.name : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.name)}
                 />
+                <ErrorText message={errors.name} />
 
                 <label htmlFor="edit-desc" className="text-sm font-medium">Description:</label>
                 <textarea
@@ -37,8 +47,9 @@ export const EditCategory = ({
                     rows={3}
                     value={category ? category.description : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.description)}
                 />
+                <ErrorText message={errors.description} />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">

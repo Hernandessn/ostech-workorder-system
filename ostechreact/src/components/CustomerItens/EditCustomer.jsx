@@ -1,12 +1,21 @@
 import { Modal } from '../Modal';
 
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
+
 export const EditCustomer = ({
     customer,
     isOpen,
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Edit Customer">
@@ -27,18 +36,21 @@ export const EditCustomer = ({
                     name="name"
                     value={customer ? customer.name : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.name)}
                 />
+                <ErrorText message={errors.name} />
 
                 <label htmlFor="edit-email" className="text-sm font-medium">Email:</label>
                 <input
                     id="edit-email"
-                    type="text"
+                    type="email"
                     name="email"
                     value={customer ? customer.email : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.email)}
                 />
+                <ErrorText message={errors.email} />
+
                 <label htmlFor="edit-phone" className="text-sm font-medium">Phone:</label>
                 <input
                     id="edit-phone"
@@ -46,8 +58,10 @@ export const EditCustomer = ({
                     name="phone"
                     value={customer ? customer.phone : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.phone)}
                 />
+                <ErrorText message={errors.phone} />
+
                 <label htmlFor="edit-document" className="text-sm font-medium">Document:</label>
                 <input
                     id="edit-document"
@@ -55,9 +69,11 @@ export const EditCustomer = ({
                     name="document"
                     value={customer ? customer.document : ''}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.document)}
                 />
+                <ErrorText message={errors.document} />
             </div>
+
             <div className="flex justify-end gap-2 mt-4">
                 <button
                     onClick={onSubmit}

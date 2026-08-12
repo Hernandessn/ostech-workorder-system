@@ -1,12 +1,21 @@
 import { Modal } from '../Modal';
 
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
+
 export const CreateTechnician = ({
     technician,
     isOpen,
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Create technician">
@@ -19,8 +28,10 @@ export const CreateTechnician = ({
                     value={technician.name}
                     onChange={onChange}
                     autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.name)}
                 />
+                <ErrorText message={errors.name} />
+
                 <label htmlFor="cat-specialty" className="text-sm font-medium">Specialty:</label>
                 <input
                     id="cat-specialty"
@@ -28,9 +39,10 @@ export const CreateTechnician = ({
                     name="specialty"
                     value={technician.specialty}
                     onChange={onChange}
-                    autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.specialty)}
                 />
+                <ErrorText message={errors.specialty} />
+
                 <label htmlFor="cat-contact" className="text-sm font-medium">Contact:</label>
                 <input
                     id="cat-contact"
@@ -38,35 +50,35 @@ export const CreateTechnician = ({
                     name="contact"
                     value={technician.contact}
                     onChange={onChange}
-                    autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.contact)}
                 />
+                <ErrorText message={errors.contact} />
+
                 <label htmlFor="cat-availability" className="text-sm font-medium">Availability:</label>
                 <select
                     id="cat-availability"
                     name="availability"
                     value={technician.availability ? 'true' : 'false'}
                     onChange={(e) => onChange({
-                        target: {
-                            name: 'availability',
-                            value: e.target.value  // manda string, deixa handleChange converter
-                        }
+                        target: { name: 'availability', value: e.target.value }
                     })}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.availability)}
                 >
                     <option value="true">Available</option>
                     <option value="false">Unavailable</option>
                 </select>
+                <ErrorText message={errors.availability} />
+
                 <label htmlFor="cat-hiringDate" className="text-sm font-medium">Hiring Date:</label>
                 <input
                     id="cat-hiringDate"
-                    type="text"
+                    type="date"
                     name="hiringDate"
                     value={technician.hiringDate}
                     onChange={onChange}
-                    autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.hiringDate)}
                 />
+                <ErrorText message={errors.hiringDate} />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
@@ -77,7 +89,6 @@ export const CreateTechnician = ({
                 >
                     {isSubmitting ? 'Adding...' : 'Add'}
                 </button>
-
                 <button
                     onClick={onClose}
                     className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"

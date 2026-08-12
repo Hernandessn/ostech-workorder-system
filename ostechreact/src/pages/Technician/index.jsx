@@ -11,12 +11,14 @@ import { EmptyState } from '../../components/EmptyState';
 import { CreateButton } from '../../components/Buttons/CreateButton';
 import { Header } from '../../components/Header';
 import { TechnicianList, CreateTechnician, DeleteTechnician, EditTechnician } from '../../components/TechnicianItens';
+import { validateTechnician } from '../../validations/technicianValidation';
 
 export const Technician = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [errors, setErrors] = useState({});
     const [isEmpty, setIsEmpty] = useState([]);
 
     const [modalAdd, setModalAdd] = useState(false);
@@ -72,9 +74,16 @@ export const Technician = () => {
     }
 
     const postTechnician = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateTechnician(technicianSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.post('/technician', {
                 name: technicianSelected.name,
                 specialty: technicianSelected.specialty,
@@ -92,7 +101,6 @@ export const Technician = () => {
             console.log('STATUS:', error.response?.status);
             console.log('DATA:', error.response?.data);
             console.log('REQUEST:', error.config?.data);
-            setIsError(true);
             toast.error("Erro ao criar técnico!");
         } finally {
             setIsSubmitting(false);
@@ -100,9 +108,16 @@ export const Technician = () => {
     }
 
     const putTechnician = async () => {
-        setIsError(false);
-        setIsSubmitting(true);
         try {
+            const validationErrors = validateTechnician(technicianSelected);
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+            setErrors({});
+            setIsSubmitting(true);
+
             const response = await api.put(`/technician/${technicianSelected.technicianId}`, technicianSelected);
 
             setTechnician(prev =>
@@ -114,11 +129,10 @@ export const Technician = () => {
             );
 
             clearTechnicianSelected();
-            setModalEdit();
+            setModalEdit(false);
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao atualizar o técnico!");
         } finally {
             setIsSubmitting(false);
@@ -126,7 +140,6 @@ export const Technician = () => {
     }
 
     const deleteTechnician = async () => {
-        setIsError(false);
         setIsSubmitting(true);
         try {
             const response = await api.delete(`/technician/${technicianSelected.technicianId}`);
@@ -142,7 +155,6 @@ export const Technician = () => {
             toast.success("Técnico deletado com sucesso!");
         } catch (error) {
             console.log(error);
-            setIsError(true);
             toast.error("Erro ao deletar técnico!");
         } finally {
             setIsLoading(false);
@@ -165,6 +177,7 @@ export const Technician = () => {
                         entity="Técnico"
                         onCreate={() => {
                             clearTechnicianSelected();
+                            setErrors({});
                             setModalAdd(true);
                         }}
                     />
@@ -178,6 +191,7 @@ export const Technician = () => {
                             entity="Técnico"
                             onCreate={() => {
                                 clearTechnicianSelected();
+                                setErrors({});
                                 setModalAdd(true);
                             }}
                         />
@@ -205,6 +219,7 @@ export const Technician = () => {
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postTechnician}
+                        errors={errors}
                     />
                     <EditTechnician
                         technician={technicianSelected}
@@ -213,6 +228,7 @@ export const Technician = () => {
                         onChange={handleChange}
                         onClose={() => setModalEdit(false)}
                         onSubmit={putTechnician}
+                        errors={errors}
                     />
                     <DeleteTechnician
                         technician={technicianSelected}

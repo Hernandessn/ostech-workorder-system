@@ -1,6 +1,17 @@
 import { Modal } from '../Modal';
 
-const selectClass = "rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA] appearance-none";
+const selectClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none appearance-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const inputClass = (hasError) =>
+    `rounded-md bg-[#021526] border px-3 py-2 text-[#E2E2B6] focus:outline-none ${
+        hasError ? 'border-red-500 focus:border-red-500' : 'border-[#6EACDA]/40 focus:border-[#6EACDA]'
+    }`;
+
+const ErrorText = ({ message }) =>
+    message ? <span className="text-red-500 text-sm">{message}</span> : null;
 
 export const CreateWorkOrder = ({
     workOrder,
@@ -12,7 +23,8 @@ export const CreateWorkOrder = ({
     onClose,
     onChange,
     isSubmitting,
-    onSubmit
+    onSubmit,
+    errors
 }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Create WorkOrder">
@@ -25,8 +37,9 @@ export const CreateWorkOrder = ({
                     value={workOrder.title}
                     onChange={onChange}
                     autoFocus
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.title)}
                 />
+                <ErrorText message={errors.title} />
 
                 <label htmlFor="cat-description" className="text-sm font-medium">Description:</label>
                 <input
@@ -35,8 +48,9 @@ export const CreateWorkOrder = ({
                     name="description"
                     value={workOrder.description}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.description)}
                 />
+                <ErrorText message={errors.description} />
 
                 <label htmlFor="cat-amount" className="text-sm font-medium">Amount:</label>
                 <input
@@ -45,8 +59,9 @@ export const CreateWorkOrder = ({
                     name="amount"
                     value={workOrder.amount}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.amount)}
                 />
+                <ErrorText message={errors.amount} />
 
                 <label htmlFor="cat-deadline" className="text-sm font-medium">Deadline:</label>
                 <input
@@ -55,8 +70,9 @@ export const CreateWorkOrder = ({
                     name="deadline"
                     value={workOrder.deadline}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.deadline)}
                 />
+                <ErrorText message={errors.deadline} />
 
                 <label htmlFor="cat-openingDate" className="text-sm font-medium">Opening Date:</label>
                 <input
@@ -65,8 +81,9 @@ export const CreateWorkOrder = ({
                     name="openingDate"
                     value={workOrder.openingDate}
                     onChange={onChange}
-                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                    className={inputClass(errors.openingDate)}
                 />
+                <ErrorText message={errors.openingDate} />
 
                 <label htmlFor="cat-customerId" className="text-sm font-medium">Customer:</label>
                 <select
@@ -74,7 +91,7 @@ export const CreateWorkOrder = ({
                     name="customerId"
                     value={workOrder.customerId}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.customerId)}
                 >
                     <option value="">Select a customer</option>
                     {customers.map(customer => (
@@ -83,6 +100,7 @@ export const CreateWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.customerId} />
 
                 <label htmlFor="cat-categoryId" className="text-sm font-medium">Category:</label>
                 <select
@@ -90,7 +108,7 @@ export const CreateWorkOrder = ({
                     name="categoryId"
                     value={workOrder.categoryId}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.categoryId)}
                 >
                     <option value="">Select a category</option>
                     {categories.map(category => (
@@ -99,6 +117,7 @@ export const CreateWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.categoryId} />
 
                 <label htmlFor="cat-equipmentId" className="text-sm font-medium">Equipment:</label>
                 <select
@@ -106,7 +125,7 @@ export const CreateWorkOrder = ({
                     name="equipmentId"
                     value={workOrder.equipmentId}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.equipmentId)}
                 >
                     <option value="">Select an equipment</option>
                     {equipments.map(equipment => (
@@ -115,6 +134,7 @@ export const CreateWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.equipmentId} />
 
                 <label htmlFor="cat-technicianId" className="text-sm font-medium">Technician:</label>
                 <select
@@ -122,7 +142,7 @@ export const CreateWorkOrder = ({
                     name="technicianId"
                     value={workOrder.technicianId}
                     onChange={onChange}
-                    className={selectClass}
+                    className={selectClass(errors.technicianId)}
                 >
                     <option value="">Select a technician</option>
                     {technicians.map(technician => (
@@ -131,6 +151,7 @@ export const CreateWorkOrder = ({
                         </option>
                     ))}
                 </select>
+                <ErrorText message={errors.technicianId} />
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
