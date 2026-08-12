@@ -72,6 +72,7 @@ export const Customer = () => {
     }
     const postCustomer = async () => {
         setIsError(false);
+        setIsSubmitting(true);
         try {
             const response = await api.post('/customer', {
                 name: customerSelected.name,

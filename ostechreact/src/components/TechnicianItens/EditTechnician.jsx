@@ -1,7 +1,7 @@
 import { Modal } from '../Modal';
 
-export const EditCustomer = ({
-    customer,
+export const EditTechnician = ({
+    technician,
     isOpen,
     onClose,
     onChange,
@@ -9,14 +9,14 @@ export const EditCustomer = ({
     onSubmit
 }) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Edit Customer">
+        <Modal isOpen={isOpen} onClose={onClose} title="Edit Technician">
             <div className="flex flex-col gap-3">
                 <label htmlFor="edit-id" className="text-sm font-medium">ID</label>
                 <input
                     id="edit-id"
                     type="text"
                     readOnly
-                    value={customer ? customer.customerId : ''}
+                    value={technician ? technician.technicianId : ''}
                     className="rounded-md bg-[#021526]/60 border border-[#6EACDA]/20 px-3 py-2 text-[#E2E2B6]/70 cursor-not-allowed"
                 />
 
@@ -25,35 +25,44 @@ export const EditCustomer = ({
                     id="edit-name"
                     type="text"
                     name="name"
-                    value={customer ? customer.name : ''}
+                    value={technician ? technician.name : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
 
-                <label htmlFor="edit-email" className="text-sm font-medium">Email:</label>
+                <label htmlFor="edit-specialty" className="text-sm font-medium">Specialty:</label>
                 <input
-                    id="edit-email"
+                    id="edit-specialty"
                     type="text"
-                    name="email"
-                    value={customer ? customer.email : ''}
+                    name="specialty"
+                    value={technician ? technician.specialty : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="edit-phone" className="text-sm font-medium">Phone:</label>
+                <label htmlFor="edit-contact" className="text-sm font-medium">Contact:</label>
                 <input
-                    id="edit-phone"
+                    id="edit-contact"
                     type="text"
-                    name="name"
-                    value={customer ? customer.phone : ''}
+                    name="contact"
+                    value={technician ? technician.contact : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="edit-document" className="text-sm font-medium">Document:</label>
+                <label htmlFor="edit-availability" className="text-sm font-medium">Availability:</label>
                 <input
-                    id="edit-document"
+                    id="edit-availability"
                     type="text"
-                    name="name"
-                    value={customer ? customer.document : ''}
+                    name="availability"
+                    value={technician ? technician.availability : ''}
+                    onChange={onChange}
+                    className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
+                />
+                <label htmlFor="edit-hiringDate" className="text-sm font-medium">Hiring Date:</label>
+                <input
+                    id="edit-hiringDate"
+                    type="text"
+                    name="hiringDate"
+                    value={technician ? technician.hiringDate : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
