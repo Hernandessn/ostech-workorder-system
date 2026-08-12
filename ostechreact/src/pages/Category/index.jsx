@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon } from '@phosphor-icons/react';
 
 import api from '../../services/api';
 
@@ -11,6 +10,7 @@ import { CreateCategory, CategoryList, EditCategory, DeleteCategory } from '../.
 import { CreateButton } from '../../components/Buttons/CreateButton';
 import { Container } from '../../components/Container';
 import { Header } from '../../components/Header';
+
 import { toast } from 'react-toastify';
 
 export const Category = () => {
