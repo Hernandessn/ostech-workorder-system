@@ -138,6 +138,7 @@ export const Customer = () => {
             );
 
             clearCustomerSelected();
+            setModalDelete(false);
             toast.success("Cliente deletedo com sucesso!");
         } catch (error) {
             console.log(error)
@@ -219,7 +220,7 @@ export const Customer = () => {
                         customer={customerSelected}
                         isOpen={modalDelete}
                         isSubmitting={isSubmitting}
-                        onClose={() => setModalDelete(true)}
+                        onClose={() => setModalDelete(false)}
                         onConfirm={deleteCustomer}
                     />
                 </section>

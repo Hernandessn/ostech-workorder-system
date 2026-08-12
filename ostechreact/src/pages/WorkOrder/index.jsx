@@ -1,19 +1,14 @@
 import { useEffect, useState } from 'react';
-import './styles.css';
 import api from '../../services/api';
 import logoOstech from '../../assets/logo-ostech.png';
-import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react';
-import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { WorkOrderList } from '../../components/WorkOrderItens/WorkOrderList';
 import { Container } from '../../components/Container';
 import { toast } from 'react-toastify';
 import { ErrorState } from '../../components/ErrorState';
 import { Loading } from '../../components/Loading';
 import { CreateButton } from '../../components/Buttons/CreateButton';
 import { Header } from '../../components/Header';
-import { CreateWorkOrder } from '../../components/WorkOrderItens/CreateWorkOrder';
-import { EditWorkOrder } from '../../components/WorkOrderItens/EditWorkOrder';
-import { DeleteWorkOrder } from '../../components/WorkOrderItens/DeleteWorkOrder';
+import { WorkOrderList, CreateWorkOrder, EditWorkOrder, DeleteWorkOrder } from '../../components/WorkOrderItens';
+import { EmptyState } from '../../components/EmptyState';
 
 export const WorkOrder = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);

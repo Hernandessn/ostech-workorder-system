@@ -49,14 +49,18 @@ export const EditTechnician = ({
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
                 <label htmlFor="edit-availability" className="text-sm font-medium">Availability:</label>
-                <input
-                    id="edit-availability"
-                    type="text"
+                <select
+                    id="cat-availability"
                     name="availability"
-                    value={technician ? technician.availability : ''}
-                    onChange={onChange}
+                    value={technician.availability ? 'true' : 'false'}
+                    onChange={(e) => onChange({
+                        target: { name: 'availability', value: e.target.value }
+                    })}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
-                />
+                >
+                    <option value="true">Available</option>
+                    <option value="false">Unavailable</option>
+                </select>
                 <label htmlFor="edit-hiringDate" className="text-sm font-medium">Hiring Date:</label>
                 <input
                     id="edit-hiringDate"

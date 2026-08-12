@@ -2,9 +2,7 @@ import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import logoOstech from '../../assets/logo-ostech.png';
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
-import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
-import './styles.css';
 import { toast } from 'react-toastify';
 import { Container } from '../../components/Container';
 import { ErrorState } from '../../components/ErrorState';
