@@ -1,7 +1,7 @@
 import { Modal } from '../Modal';
 
-export const EditCustomer = ({
-    customer,
+export const EditEquipment = ({
+    equipment,
     isOpen,
     onClose,
     onChange,
@@ -9,14 +9,14 @@ export const EditCustomer = ({
     onSubmit
 }) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Edit Customer">
+        <Modal isOpen={isOpen} onClose={onClose} title="Edit equipment">
             <div className="flex flex-col gap-3">
                 <label htmlFor="edit-id" className="text-sm font-medium">ID</label>
                 <input
                     id="edit-id"
                     type="text"
                     readOnly
-                    value={customer ? customer.customerId : ''}
+                    value={equipment ? equipment.equipmentId : ''}
                     className="rounded-md bg-[#021526]/60 border border-[#6EACDA]/20 px-3 py-2 text-[#E2E2B6]/70 cursor-not-allowed"
                 />
 
@@ -25,35 +25,35 @@ export const EditCustomer = ({
                     id="edit-name"
                     type="text"
                     name="name"
-                    value={customer ? customer.name : ''}
+                    value={equipment ? equipment.name : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
 
-                <label htmlFor="edit-email" className="text-sm font-medium">Email:</label>
+                <label htmlFor="edit-brand" className="text-sm font-medium">Brand:</label>
                 <input
-                    id="edit-email"
+                    id="edit-brand"
                     type="text"
-                    name="email"
-                    value={customer ? customer.email : ''}
+                    name="brand"
+                    value={equipment ? equipment.brand : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="edit-phone" className="text-sm font-medium">Phone:</label>
+                <label htmlFor="edit-model" className="text-sm font-medium">Model:</label>
                 <input
-                    id="edit-phone"
+                    id="edit-model"
                     type="text"
-                    name="phone"
-                    value={customer ? customer.phone : ''}
+                    name="model"
+                    value={equipment ? equipment.model : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="edit-document" className="text-sm font-medium">Document:</label>
+                <label htmlFor="edit-serialNumber" className="text-sm font-medium">Serial Number:</label>
                 <input
-                    id="edit-document"
+                    id="edit-serialNumber"
                     type="text"
-                    name="document"
-                    value={customer ? customer.document : ''}
+                    name="name"
+                    value={equipment ? equipment.serialNumber : ''}
                     onChange={onChange}
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
