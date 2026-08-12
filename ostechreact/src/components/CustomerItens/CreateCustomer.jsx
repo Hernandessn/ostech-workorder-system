@@ -21,7 +21,7 @@ export const CreateCustomer = ({
                     autoFocus
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="cat-name" className="text-sm font-medium">Email:</label>
+                <label htmlFor="cat-email" className="text-sm font-medium">Email:</label>
                 <input
                     id="cat-email"
                     type="text"
@@ -31,7 +31,7 @@ export const CreateCustomer = ({
                     autoFocus
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="cat-name" className="text-sm font-medium">Phone:</label>
+                <label htmlFor="cat-phone" className="text-sm font-medium">Phone:</label>
                 <input
                     id="cat-phone"
                     type="text"
@@ -41,7 +41,7 @@ export const CreateCustomer = ({
                     autoFocus
                     className="rounded-md bg-[#021526] border border-[#6EACDA]/40 px-3 py-2 text-[#E2E2B6] focus:outline-none focus:border-[#6EACDA]"
                 />
-                <label htmlFor="cat-name" className="text-sm font-medium">Document:</label>
+                <label htmlFor="cat-document" className="text-sm font-medium">Document:</label>
                 <input
                     id="cat-document"
                     type="text"
