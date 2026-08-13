@@ -11,14 +11,32 @@ import { Header } from '../../components/Header';
 import { EquipmentList, CreateEquipment, EditEquipment, DeleteEquipment } from '../../components/EquipmentItens';
 import { validateEquipment } from '../../validations/equipmentValidation';
 import { getApiErrorMessage } from '../../utils/apiError.js';
+import { useRequestState } from '../../hooks/useRequestState.js';
+import { useModals } from '../../hooks/useModals.js';
 
 export const Equipment = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        isLoading,
+        setIsLoading,
+        isSubmitting,
+        setIsSubmitting,
+        isError,
+        setIsError,
+        errors,
+        setErrors
+    } = useRequestState();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [isEmpty, setIsEmpty] = useState([]);
+    const {
+        isCreateOpen,
+        isEditOpen,
+        isDeleteOpen,
+        openCreate,
+        closeCreate,
+        openEdit,
+        closeEdit,
+        openDelete,
+        closeDelete
+    } = useModals();
 
     const [equipmentSelected, setEquipmentSelected] = useState({
         equipmentId: '',
@@ -27,11 +45,8 @@ export const Equipment = () => {
         model: '',
         serialNumber: ''
     });
-    const [equipment, setEquipment] = useState([]);
 
-    const [modalAdd, setModalAdd] = useState(false);
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
+    const [equipment, setEquipment] = useState([]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -58,7 +73,6 @@ export const Equipment = () => {
         try {
             const response = await api.get('/equipment');
 
-            console.log(response.data);
             setEquipment(response.data);
         } catch (error) {
             setIsError(true);
@@ -88,7 +102,7 @@ export const Equipment = () => {
             setEquipment(prev => [...prev, response.data]);
 
             clearEquipmentSelected();
-            setModalAdd(false);
+            closeCreate();
             toast.success("Equipamento criado com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -120,7 +134,7 @@ export const Equipment = () => {
             );
 
             clearEquipmentSelected();
-            setModalEdit(false);
+            closeEdit();
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -143,7 +157,7 @@ export const Equipment = () => {
             );
 
             clearEquipmentSelected();
-            setModalDelete(false);
+            closeDelete();
             toast.success("Equipamento deletado com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -170,7 +184,7 @@ export const Equipment = () => {
                         onCreate={() => {
                             clearEquipmentSelected()
                             setErrors({});
-                            setModalAdd(true)
+                            openCreate();
                         }}
                     />
                 </div>
@@ -184,7 +198,7 @@ export const Equipment = () => {
                             onCreate={() => {
                                 clearEquipmentSelected()
                                 setErrors({});
-                                setModalAdd(true)
+                                openCreate();
                             }}
                         />
                     </div>
@@ -194,20 +208,20 @@ export const Equipment = () => {
                                 key={value.equipmentId}
                                 equipment={value}
                                 onEdit={() => {
-                                    setEquipmentSelected(value)
-                                    setModalEdit(true)
+                                    setEquipmentSelected(value);
+                                    openEdit();
                                 }}
                                 onDelete={() => {
-                                    setEquipmentSelected(value)
-                                    setModalDelete(true)
+                                    setEquipmentSelected(value);
+                                    openDelete();
                                 }}
                             />
                         ))}
                     </ul>
                     <CreateEquipment
                         equipment={equipmentSelected}
-                        isOpen={modalAdd}
-                        onClose={() => setModalAdd(false)}
+                        isOpen={openCreate()}
+                        onClose={closeCreate()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postEquipment}
@@ -215,8 +229,8 @@ export const Equipment = () => {
                     />
                     <EditEquipment
                         equipment={equipmentSelected}
-                        isOpen={modalEdit}
-                        onClose={() => setModalEdit(false)}
+                        isOpen={openEdit()}
+                        onClose={closeEdit()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={putEquipment}
@@ -224,8 +238,8 @@ export const Equipment = () => {
                     />
                     <DeleteEquipment
                         equipment={equipmentSelected}
-                        isOpen={modalDelete}
-                        onClose={() => setModalDelete(false)}
+                        isOpen={openDelete()}
+                        onClose={closeDelete()}
                         isSubmitting={isSubmitting}
                         onConfirm={deleteEquipment}
                     />

@@ -10,14 +10,33 @@ import { Header } from '../../components/Header';
 import { WorkOrderList, CreateWorkOrder, EditWorkOrder, DeleteWorkOrder } from '../../components/WorkOrderItens';
 import { EmptyState } from '../../components/EmptyState';
 import { validateWorkOrder } from '../../validations/workOrderValidation';
+import { useRequestState } from '../../hooks/useRequestState';
+import { useModals } from '../../hooks/useModals';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 export const WorkOrder = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        isLoading,
+        setIsLoading,
+        isSubmitting,
+        setIsSubmitting,
+        isError,
+        setIsError,
+        errors,
+        setErrors
+    } = useRequestState();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [isEmpty, setIsEmpty] = useState([]);
+    const {
+        isCreateOpen,
+        isEditOpen,
+        isDeleteOpen,
+        openCreate,
+        closeCreate,
+        openEdit,
+        closeEdit,
+        openDelete,
+        closeDelete
+    } = useModals();
 
     const [workOrder, setWorkOrder] = useState([]);
 
@@ -55,11 +74,6 @@ export const WorkOrder = () => {
         });
     }
 
-    const [modalAdd, setModalAdd] = useState(false);
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setWorkOrderSelected({
@@ -79,9 +93,9 @@ export const WorkOrder = () => {
 
             setWorkOrder(response.data);
         } catch (error) {
-            console.log(error);
+
             setIsError(true);
-            toast.error("Erro ao carregar a lista!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -116,14 +130,10 @@ export const WorkOrder = () => {
             setWorkOrder(prev => [...prev, response.data]);
 
             clearWorkOrderSelected();
-            setModalAdd(false);
-            console.log(response.data);
-            console.log(response.status);
+            closeCreate();
             toast.success("Ordem de serviço criada com sucesso!");
         } catch (error) {
-            console.log(error);
-            console.log(error.response);
-            toast.error("Erro ao criar ordem de serviço!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -152,13 +162,10 @@ export const WorkOrder = () => {
             );
 
             clearWorkOrderSelected();
-            setModalEdit(false);
-            console.log(response.data);
-            console.log(response.status);
+            closeEdit();
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao atualizar ordem de serviço!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -176,13 +183,10 @@ export const WorkOrder = () => {
             );
 
             clearWorkOrderSelected();
-            setModalDelete(false);
-            console.log(response.data);
-            console.log(response.status);
+            closeDelete(false);
             toast.success("Ordem de serviço deletedo com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao deletar ordem de serviço!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -202,6 +206,7 @@ export const WorkOrder = () => {
         };
         loadOptions();
     }, []);
+
     useEffect(() => {
         getWorkOrder();
     }, [])
@@ -220,7 +225,7 @@ export const WorkOrder = () => {
                         onCreate={() => {
                             clearWorkOrderSelected();
                             setErrors({});
-                            setModalAdd(true);
+                            openCreate();
                         }}
                     />
                 </div>
@@ -235,7 +240,7 @@ export const WorkOrder = () => {
                             onCreate={() => {
                                 clearWorkOrderSelected();
                                 setErrors({});
-                                setModalAdd(true);
+                                openCreate();
                             }} />
                     </div>
                     <ul className="flex flex-col gap-3">
@@ -245,11 +250,11 @@ export const WorkOrder = () => {
                                 workOrder={value}
                                 onEdit={() => {
                                     setWorkOrderSelected(value);
-                                    setModalEdit(true);
+                                    openEdit();
                                 }}
                                 onDelete={() => {
                                     setWorkOrderSelected(value);
-                                    setModalDelete(true);
+                                    openDelete();
                                 }}
                             />
                         ))}
@@ -261,8 +266,8 @@ export const WorkOrder = () => {
                         customers={customers}
                         categories={categories}
                         equipments={equipments}
-                        isOpen={modalAdd}
-                        onClose={() => setModalAdd(false)}
+                        isOpen={openCreate()}
+                        onClose={closeCreate()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postWorkOrder}
@@ -275,8 +280,8 @@ export const WorkOrder = () => {
                         customers={customers}
                         categories={categories}
                         equipments={equipments}
-                        isOpen={modalEdit}
-                        onClose={() => setModalEdit(false)}
+                        isOpen={openEdit()}
+                        onClose={closeEdit()}
                         onChange={handleChange}
                         isSubmitting={isSubmitting}
                         onSubmit={putWorkOrder}
@@ -284,8 +289,8 @@ export const WorkOrder = () => {
                     />
                     <DeleteWorkOrder
                         workOrder={workOrderSelected}
-                        isOpen={modalDelete}
-                        onClose={() => setModalDelete(false)}
+                        isOpen={openDelete()}
+                        onClose={closeDelete()}
                         isSubmitting={isSubmitting}
                         onConfirm={deleteWorkOrder}
                     />

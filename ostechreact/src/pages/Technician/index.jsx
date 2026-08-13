@@ -13,20 +13,35 @@ import { Header } from '../../components/Header';
 import { TechnicianList, CreateTechnician, DeleteTechnician, EditTechnician } from '../../components/TechnicianItens';
 import { validateTechnician } from '../../validations/technicianValidation';
 import { getApiErrorMessage } from '../../utils/apiError.js';
+import { useRequestState } from '../../hooks/useRequestState.js';
+import { useModals } from '../../hooks/useModals.js';
 
 export const Technician = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        isLoading,
+        setIsLoading,
+        isSubmitting,
+        setIsSubmitting,
+        isError,
+        setIsError,
+        errors,
+        setErrors
+    } = useRequestState();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [isEmpty, setIsEmpty] = useState([]);
-
-    const [modalAdd, setModalAdd] = useState(false);
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
+    const {
+        isCreateOpen,
+        isEditOpen,
+        isDeleteOpen,
+        openCreate,
+        closeCreate,
+        openEdit,
+        closeEdit,
+        openDelete,
+        closeDelete
+    } = useModals();
 
     const [technician, setTechnician] = useState([]);
+
     const [technicianSelected, setTechnicianSelected] = useState({
         technicianId: '',
         name: '',
@@ -66,7 +81,6 @@ export const Technician = () => {
 
             setTechnician(response.data);
         } catch (error) {
-            console.log(error);
             setIsError(true);
             toast.error(getApiErrorMessage(error));
         } finally {
@@ -96,7 +110,7 @@ export const Technician = () => {
             setTechnician(prev => [...prev, response.data]);
 
             clearTechnicianSelected();
-            setModalAdd(false);
+            closeCreate();
             toast.success("Técnico criado com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -127,7 +141,7 @@ export const Technician = () => {
             );
 
             clearTechnicianSelected();
-            setModalEdit(false);
+            closeEdit();
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -148,7 +162,7 @@ export const Technician = () => {
             );
 
             clearTechnicianSelected();
-            setModalDelete(false);
+            closeDelete();
             toast.success("Técnico deletado com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -174,7 +188,7 @@ export const Technician = () => {
                         onCreate={() => {
                             clearTechnicianSelected();
                             setErrors({});
-                            setModalAdd(true);
+                            openCreate();
                         }}
                     />
                 </div>
@@ -188,7 +202,7 @@ export const Technician = () => {
                             onCreate={() => {
                                 clearTechnicianSelected();
                                 setErrors({});
-                                setModalAdd(true);
+                                openCreate();
                             }}
                         />
                     </div>
@@ -199,19 +213,19 @@ export const Technician = () => {
                                 technician={value}
                                 onEdit={() => {
                                     setTechnicianSelected(value);
-                                    setModalEdit(true);
+                                    openEdit();
                                 }}
                                 onDelete={() => {
                                     setTechnicianSelected(value);
-                                    setModalDelete(true)
+                                    openDelete();
                                 }}
                             />
                         ))}
                     </ul>
                     <CreateTechnician
                         technician={technicianSelected}
-                        isOpen={modalAdd}
-                        onClose={() => setModalAdd(false)}
+                        isOpen={openCreate()}
+                        onClose={closeCreate()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postTechnician}
@@ -219,17 +233,17 @@ export const Technician = () => {
                     />
                     <EditTechnician
                         technician={technicianSelected}
-                        isOpen={modalEdit}
+                        isOpen={openEdit()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
-                        onClose={() => setModalEdit(false)}
+                        onClose={closeEdit()}
                         onSubmit={putTechnician}
                         errors={errors}
                     />
                     <DeleteTechnician
                         technician={technicianSelected}
-                        isOpen={modalDelete}
-                        onClose={() => setModalDelete(false)}
+                        isOpen={openDelete()}
+                        onClose={closeDelete()}
                         isSubmitting={isSubmitting}
                         onConfirm={deleteTechnician}
                     />

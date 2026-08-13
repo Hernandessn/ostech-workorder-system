@@ -15,15 +15,32 @@ import { Header } from '../../components/Header';
 import { toast } from 'react-toastify';
 import { validateCustomer } from '../../validations/customerValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
-
+import { useRequestState } from '../../hooks/useRequestState';
+import { useModals } from '../../hooks/useModals';
 
 export const Customer = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        isLoading,
+        setIsLoading,
+        isSubmitting,
+        setIsSubmitting,
+        isError,
+        setIsError,
+        errors,
+        setErrors
+    } = useRequestState();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [isEmpty, setIsEmpty] = useState([]);
+    const {
+        isCreateOpen,
+        isEditOpen,
+        isDeleteOpen,
+        openCreate,
+        closeCreate,
+        openEdit,
+        closeEdit,
+        openDelete,
+        closeDelete
+    } = useModals();
 
     const [customerSelected, setCustomerSelected] = useState({
         customerId: '',
@@ -34,10 +51,6 @@ export const Customer = () => {
     });
 
     const [customer, setCustomer] = useState([]);
-
-    const [modalAdd, setModalAdd] = useState(false);
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -63,10 +76,9 @@ export const Customer = () => {
         setIsLoading(true);
         try {
             const response = await api.get('/customer');
-            console.log(response.data);
+
             setCustomer(response.data);
         } catch (error) {
-            console.log(error);
             setIsError(true);
             toast.error(getApiErrorMessage(error));
         } finally {
@@ -93,7 +105,7 @@ export const Customer = () => {
             setCustomer(prev => [...prev, response.data]);
 
             clearCustomerSelected();
-            setModalAdd(false);
+            openCreate();
             toast.success("Cliente criado com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -126,7 +138,7 @@ export const Customer = () => {
             );
 
             clearCustomerSelected();
-            setModalEdit(false);
+            closeEdit();
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -148,7 +160,7 @@ export const Customer = () => {
             );
 
             clearCustomerSelected();
-            setModalDelete(false);
+            closeDelete();
             toast.success("Cliente deletedo com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -176,7 +188,7 @@ export const Customer = () => {
                         onCreate={() => {
                             clearCustomerSelected();
                             setErrors({});
-                            setModalAdd(true);
+                            openCreate();
                         }}
                     />
                 </div>
@@ -190,7 +202,7 @@ export const Customer = () => {
                             onCreate={() => {
                                 clearCustomerSelected();
                                 setErrors({});
-                                setModalAdd(true);
+                                openCreate();
                             }} />
                     </div>
                     <ul className="flex flex-col gap-3">
@@ -200,18 +212,18 @@ export const Customer = () => {
                                 customer={value}
                                 onEdit={() => {
                                     setCustomerSelected(value);
-                                    setModalEdit(true);
+                                    openEdit();
                                 }}
                                 onDelete={() => {
                                     setCustomerSelected(value);
-                                    setModalDelete(true);
+                                    openDelete();
                                 }} />
                         ))}
                     </ul>
                     <CreateCustomer
                         customer={customerSelected}
-                        isOpen={modalAdd}
-                        onClose={() => setModalAdd(false)}
+                        isOpen={openCreate()}
+                        onClose={closeCreate()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postCustomer}
@@ -219,8 +231,8 @@ export const Customer = () => {
                     />
                     <EditCustomer
                         customer={customerSelected}
-                        isOpen={modalEdit}
-                        onClose={() => setModalEdit(false)}
+                        isOpen={openEdit()}
+                        onClose={closeEdit()}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={putCustomer}
@@ -228,9 +240,9 @@ export const Customer = () => {
                     />
                     <DeleteCustomer
                         customer={customerSelected}
-                        isOpen={modalDelete}
+                        isOpen={openDelete()}
                         isSubmitting={isSubmitting}
-                        onClose={() => setModalDelete(false)}
+                        onClose={closeDelete()}
                         onConfirm={deleteCustomer}
                     />
                 </section>

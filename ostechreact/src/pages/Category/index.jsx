@@ -14,12 +14,31 @@ import { Header } from '../../components/Header';
 import { toast } from 'react-toastify';
 import { validateCategory } from '../../validations/categoryValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { useRequestState } from '../../hooks/useRequestState';
 
 export const Category = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [errors, setErrors] = useState({});
+    const {
+        isLoading,
+        setIsLoading,
+        isSubmitting,
+        setIsSubmitting,
+        isError,
+        setIsError,
+        errors,
+        setErrors
+    } = useRequestState();
+
+    const {
+        isCreateOpen,
+        isEditOpen,
+        isDeleteOpen,
+        openCreate,
+        closeCreate,
+        openEdit,
+        closeEdit,
+        openDelete,
+        closeDelete
+    } = useModals();
 
     const [categorySelected, setCategorySelected] = useState({
         categoryId: '',
@@ -28,9 +47,6 @@ export const Category = () => {
     });
 
     const [category, setCategory] = useState([]);
-    const [modalAdd, setModalAdd] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
-    const [modalEdit, setModalEdit] = useState(false);
 
     const handleChange = e => {
         const { name, value } = e.target;
@@ -91,7 +107,7 @@ export const Category = () => {
             });
 
             clearCategorySelected();
-            setModalAdd(false);
+            closeCreate();
             toast.success("Categoria criada com sucesso!")
         } catch (error) {
             console.log(error);
@@ -125,7 +141,7 @@ export const Category = () => {
                 )
             );
             clearCategorySelected();
-            setModalEdit(false);
+            closeEdit();
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
@@ -148,7 +164,7 @@ export const Category = () => {
                 )
             );
             clearCategorySelected();
-            setModalDelete(false);
+            closeDelete();
             toast.success("Categoria deletada com sucesso!");
         } catch (error) {
             console.log(error);
@@ -181,7 +197,7 @@ export const Category = () => {
                                     onCreate={() => {
                                         clearCategorySelected()
                                         setErrors({});
-                                        setModalAdd(true)
+                                        openCreate();
                                     }}
                                 />
                             </div>
@@ -195,7 +211,8 @@ export const Category = () => {
                                         onCreate={() => {
                                             clearCategorySelected()
                                             setErrors({});
-                                            setModalAdd(true)
+                                            openCreate();
+
                                         }}
                                     />
                                 </div>
@@ -206,18 +223,18 @@ export const Category = () => {
                                             category={value}
                                             onEdit={() => {
                                                 setCategorySelected(value)
-                                                setModalEdit(true)
+                                                openEdit();
                                             }}
                                             onDelete={() => {
                                                 setCategorySelected(value)
-                                                setModalDelete(true)
+                                                openDelete();
                                             }} />
                                     ))}
                                 </ul>
                                 <CreateCategory
                                     category={categorySelected}
-                                    isOpen={modalAdd}
-                                    onClose={() => setModalAdd(false)}
+                                    isOpen={openCreate()}
+                                    onClose={closeCreate()}
                                     onChange={handleChange}
                                     isSubmitting={isSubmitting}
                                     onSubmit={postCategory}
@@ -225,8 +242,8 @@ export const Category = () => {
                                 />
                                 <EditCategory
                                     category={categorySelected}
-                                    isOpen={modalEdit}
-                                    onClose={() => setModalEdit(false)}
+                                    isOpen={openEdit()}
+                                    onClose={closeEdit()}
                                     onChange={handleChange}
                                     isSubmitting={isSubmitting}
                                     onSubmit={putCategory}
@@ -234,8 +251,8 @@ export const Category = () => {
                                 />
                                 <DeleteCategory
                                     category={categorySelected}
-                                    isOpen={modalDelete}
-                                    onClose={() => setModalDelete(false)}
+                                    isOpen={openDelete()}
+                                    onClose={closeDelete()}
                                     isSubmitting={isSubmitting}
                                     onConfirm={deleteCategory}
                                 />
