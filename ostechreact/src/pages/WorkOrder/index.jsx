@@ -13,6 +13,7 @@ import { validateWorkOrder } from '../../validations/workOrderValidation';
 import { useRequestState } from '../../hooks/useRequestState';
 import { useModals } from '../../hooks/useModals';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { workOrderService } from '../../services/workOrderService';
 
 export const WorkOrder = () => {
     const {
@@ -87,7 +88,7 @@ export const WorkOrder = () => {
         setIsError(false);
         setIsLoading(true);
         try {
-            const response = await api.get('/workorder');
+            const response = await workOrderService.getAll();
 
             console.log(response.data);
 
@@ -114,7 +115,7 @@ export const WorkOrder = () => {
             setIsSubmitting(true);
 
 
-            const response = await api.post('/workorder', {
+            const response = await workOrderService.create({
                 title: workOrderSelected.title,
                 description: workOrderSelected.description,
                 amount: workOrderSelected.amount,
@@ -151,7 +152,7 @@ export const WorkOrder = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.put(`/workorder/${workOrderSelected.workOrderId}`, workOrderSelected);
+            const response = await workOrderService.update(workOrderSelected.workOrderId, workOrderSelected);
 
             setWorkOrder(prev =>
                 prev.map(item =>
@@ -174,7 +175,7 @@ export const WorkOrder = () => {
     const deleteWorkOrder = async () => {
         setIsSubmitting(true);
         try {
-            const response = await api.delete(`/workOrder/${workOrderSelected.workOrderId}`);
+            const response = await workOrderService.delete(workOrderSelected.workOrderId);
 
             setWorkOrder(prev =>
                 prev.filter(item =>

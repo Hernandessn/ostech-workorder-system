@@ -1,7 +1,4 @@
-
 import { useEffect, useState } from 'react';
-
-import api from '../../services/api';
 
 import { Container } from '../../components/Container';
 import { CreateButton } from '../../components/Buttons/CreateButton';
@@ -17,6 +14,7 @@ import { validateCustomer } from '../../validations/customerValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useRequestState } from '../../hooks/useRequestState';
 import { useModals } from '../../hooks/useModals';
+import { customerService } from '../../services/customerService';
 
 export const Customer = () => {
     const {
@@ -75,7 +73,7 @@ export const Customer = () => {
         setIsError(false);
         setIsLoading(true);
         try {
-            const response = await api.get('/customer');
+            const response = await customerService.getAll();
 
             setCustomer(response.data);
         } catch (error) {
@@ -96,7 +94,7 @@ export const Customer = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.post('/customer', {
+            const response = await customerService.create({
                 name: customerSelected.name,
                 email: customerSelected.email,
                 phone: customerSelected.phone,
@@ -105,7 +103,7 @@ export const Customer = () => {
             setCustomer(prev => [...prev, response.data]);
 
             clearCustomerSelected();
-            openCreate();
+            closeCreate();
             toast.success("Cliente criado com sucesso!");
         } catch (error) {
             toast.error(getApiErrorMessage(error));
@@ -124,8 +122,8 @@ export const Customer = () => {
             }
             setErrors({});
             setIsSubmitting(true);
-            const response = await api.put(
-                `/customer/${customerSelected.customerId}`,
+            const response = await customerService.update(
+                customerSelected.customerId,
                 customerSelected
             );
 
@@ -150,7 +148,7 @@ export const Customer = () => {
     const deleteCustomer = async () => {
         setIsSubmitting(true);
         try {
-            const response = await api.delete(`/customer/${customerSelected.customerId}`);
+            const response = await customerService.delete(customerSelected.customerId);
 
             setCustomer(prev =>
                 prev.filter(

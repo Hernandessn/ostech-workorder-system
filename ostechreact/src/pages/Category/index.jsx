@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-import api from '../../services/api';
-
 import { Loading } from '../../components/Loading';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
@@ -16,6 +14,7 @@ import { validateCategory } from '../../validations/categoryValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useRequestState } from '../../hooks/useRequestState';
 import { useModals } from '../../hooks/useModals';
+import { categoryService } from '../../services/categoryService';
 
 export const Category = () => {
     const {
@@ -71,11 +70,11 @@ export const Category = () => {
         setIsError(false);
         setIsLoading(true);
         try {
-            const response = await api.get('/category');
+            const response = await categoryService.getAll();
 
             setCategory(response.data);
         } catch (error) {
-            console.log(error);
+
             setIsError(true);
             toast.error(getApiErrorMessage(error));
         } finally {
@@ -94,7 +93,7 @@ export const Category = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.post('/category', {
+            const response = await categoryService.create({
                 name: categorySelected.name,
                 description: categorySelected.description
             });
@@ -129,8 +128,8 @@ export const Category = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.put(
-                `/category/${categorySelected.categoryId}`,
+            const response = await categoryService.update(
+                categorySelected.categoryId,
                 categorySelected
             );
 
@@ -154,9 +153,7 @@ export const Category = () => {
     const deleteCategory = async () => {
         setIsSubmitting(true);
         try {
-            await api.delete(
-                `/category/${categorySelected.categoryId}`
-            );
+            await categoryService.delete(categorySelected.categoryId);
 
             setCategory(prev =>
                 prev.filter(

@@ -15,6 +15,7 @@ import { validateTechnician } from '../../validations/technicianValidation';
 import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useRequestState } from '../../hooks/useRequestState.js';
 import { useModals } from '../../hooks/useModals.js';
+import { technicianService } from '../../services/technicianService.js';
 
 export const Technician = () => {
     const {
@@ -47,18 +48,15 @@ export const Technician = () => {
         name: '',
         specialty: '',
         contact: '',
-        availability: '',
+        availability: false,
         hiringDate: ''
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         setTechnicianSelected({
             ...technicianSelected,
-            [name]: name === 'availability'
-                ? value === 'true'
-                : value
+            [name]: name === 'availability' ? value === 'true' : value
         });
     };
 
@@ -68,7 +66,7 @@ export const Technician = () => {
             name: '',
             specialty: '',
             contact: '',
-            availability: '',
+            availability: false,
             hiringDate: ''
         });
     };
@@ -77,7 +75,7 @@ export const Technician = () => {
         setIsError(false);
         setIsLoading(true);
         try {
-            const response = await api.get('/technician');
+            const response = await technicianService.getAll();
 
             setTechnician(response.data);
         } catch (error) {
@@ -99,7 +97,7 @@ export const Technician = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.post('/technician', {
+            const response = await technicianService.create({
                 name: technicianSelected.name,
                 specialty: technicianSelected.specialty,
                 contact: technicianSelected.contact,
@@ -130,7 +128,7 @@ export const Technician = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.put(`/technician/${technicianSelected.technicianId}`, technicianSelected);
+            const response = await technicianService.update(technicianSelected.technicianId, technicianSelected);
 
             setTechnician(prev =>
                 prev.map(item =>
@@ -153,7 +151,7 @@ export const Technician = () => {
     const deleteTechnician = async () => {
         setIsSubmitting(true);
         try {
-            const response = await api.delete(`/technician/${technicianSelected.technicianId}`);
+            const response = await technicianService.delete(technicianSelected.technicianId);
 
             setTechnician(prev =>
                 prev.filter(item =>

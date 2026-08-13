@@ -13,6 +13,7 @@ import { validateEquipment } from '../../validations/equipmentValidation';
 import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useRequestState } from '../../hooks/useRequestState.js';
 import { useModals } from '../../hooks/useModals.js';
+import { equipmentService } from '../../services/equipmentService.js';
 
 export const Equipment = () => {
     const {
@@ -71,7 +72,7 @@ export const Equipment = () => {
         setIsError(false);
         setIsLoading(true);
         try {
-            const response = await api.get('/equipment');
+            const response = await equipmentService.getAll();
 
             setEquipment(response.data);
         } catch (error) {
@@ -93,7 +94,7 @@ export const Equipment = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.post('/equipment', {
+            const response = await equipmentService.create({
                 name: equipmentSelected.name,
                 brand: equipmentSelected.brand,
                 model: equipmentSelected.model,
@@ -123,7 +124,7 @@ export const Equipment = () => {
             setErrors({});
             setIsSubmitting(true);
 
-            const response = await api.put(`/equipment/${equipmentSelected.equipmentId}`, equipmentSelected);
+            const response = await equipmentService.update(equipmentSelected.equipmentId, equipmentSelected);
 
             setEquipment(prev =>
                 prev.map(
@@ -147,7 +148,7 @@ export const Equipment = () => {
     const deleteEquipment = async () => {
         setIsSubmitting(true);
         try {
-            const response = await api.delete(`equipment/${equipmentSelected.equipmentId}`);
+            const response = await equipmentService.delete(equipmentSelected.equipmentId);
 
             setEquipment(prev =>
                 prev.filter(
