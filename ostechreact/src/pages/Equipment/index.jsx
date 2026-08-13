@@ -10,6 +10,7 @@ import { Header } from '../../components/Header';
 
 import { EquipmentList, CreateEquipment, EditEquipment, DeleteEquipment } from '../../components/EquipmentItens';
 import { validateEquipment } from '../../validations/equipmentValidation';
+import { getApiErrorMessage } from '../../utils/apiError.js';
 
 export const Equipment = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,9 +61,8 @@ export const Equipment = () => {
             console.log(response.data);
             setEquipment(response.data);
         } catch (error) {
-            console.log(error);
             setIsError(true);
-            toast.error("Erro ao carregar a lista!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -91,8 +91,7 @@ export const Equipment = () => {
             setModalAdd(false);
             toast.success("Equipamento criado com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao criar equipamento!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -124,8 +123,7 @@ export const Equipment = () => {
             setModalEdit(false);
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao atualizar equipamento!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -148,8 +146,7 @@ export const Equipment = () => {
             setModalDelete(false);
             toast.success("Equipamento deletado com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao deletar equipamento");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }

@@ -13,6 +13,7 @@ import { Header } from '../../components/Header';
 
 import { toast } from 'react-toastify';
 import { validateCategory } from '../../validations/categoryValidation';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 export const Category = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +60,7 @@ export const Category = () => {
         } catch (error) {
             console.log(error);
             setIsError(true);
-            toast.error("Erro ao carregar a lista!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -94,7 +95,7 @@ export const Category = () => {
             toast.success("Categoria criada com sucesso!")
         } catch (error) {
             console.log(error);
-            toast.error("Erro ao criar a categoria!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -128,7 +129,7 @@ export const Category = () => {
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
-            toast.error("Erro ao atualizar categoria!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -151,7 +152,7 @@ export const Category = () => {
             toast.success("Categoria deletada com sucesso!");
         } catch (error) {
             console.log(error);
-            toast.error("Erro ao deletar categoria!")
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false)
         }

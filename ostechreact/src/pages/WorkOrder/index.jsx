@@ -117,9 +117,12 @@ export const WorkOrder = () => {
 
             clearWorkOrderSelected();
             setModalAdd(false);
+            console.log(response.data);
+            console.log(response.status);
             toast.success("Ordem de serviço criada com sucesso!");
         } catch (error) {
             console.log(error);
+            console.log(error.response);
             toast.error("Erro ao criar ordem de serviço!");
         } finally {
             setIsSubmitting(false);
@@ -150,6 +153,8 @@ export const WorkOrder = () => {
 
             clearWorkOrderSelected();
             setModalEdit(false);
+            console.log(response.data);
+            console.log(response.status);
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
             console.log(error);
@@ -172,6 +177,8 @@ export const WorkOrder = () => {
 
             clearWorkOrderSelected();
             setModalDelete(false);
+            console.log(response.data);
+            console.log(response.status);
             toast.success("Ordem de serviço deletedo com sucesso!");
         } catch (error) {
             console.log(error);

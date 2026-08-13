@@ -12,6 +12,7 @@ import { CreateButton } from '../../components/Buttons/CreateButton';
 import { Header } from '../../components/Header';
 import { TechnicianList, CreateTechnician, DeleteTechnician, EditTechnician } from '../../components/TechnicianItens';
 import { validateTechnician } from '../../validations/technicianValidation';
+import { getApiErrorMessage } from '../../utils/apiError.js';
 
 export const Technician = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,7 +68,7 @@ export const Technician = () => {
         } catch (error) {
             console.log(error);
             setIsError(true);
-            toast.error("Erro ao carregar a lista!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -98,10 +99,7 @@ export const Technician = () => {
             setModalAdd(false);
             toast.success("Técnico criado com sucesso!");
         } catch (error) {
-            console.log('STATUS:', error.response?.status);
-            console.log('DATA:', error.response?.data);
-            console.log('REQUEST:', error.config?.data);
-            toast.error("Erro ao criar técnico!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -132,8 +130,7 @@ export const Technician = () => {
             setModalEdit(false);
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao atualizar o técnico!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -154,8 +151,7 @@ export const Technician = () => {
             setModalDelete(false);
             toast.success("Técnico deletado com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao deletar técnico!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

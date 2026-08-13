@@ -14,6 +14,7 @@ import { Header } from '../../components/Header';
 
 import { toast } from 'react-toastify';
 import { validateCustomer } from '../../validations/customerValidation';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 
 export const Customer = () => {
@@ -67,7 +68,7 @@ export const Customer = () => {
         } catch (error) {
             console.log(error);
             setIsError(true);
-            toast.error("Erro ao carregar a lista!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -95,8 +96,7 @@ export const Customer = () => {
             setModalAdd(false);
             toast.success("Cliente criado com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Error ao criar cliente!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -129,8 +129,7 @@ export const Customer = () => {
             setModalEdit(false);
             toast.success("Atualizações salvas com sucesso!");
         } catch (error) {
-            console.log(error);
-            toast.error("Erro ao atualizar cliente!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -152,8 +151,7 @@ export const Customer = () => {
             setModalDelete(false);
             toast.success("Cliente deletedo com sucesso!");
         } catch (error) {
-            console.log(error)
-            toast.error("Erro ao deletar cliente!");
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
