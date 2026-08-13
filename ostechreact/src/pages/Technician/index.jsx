@@ -224,8 +224,8 @@ export const Technician = () => {
                     </ul>
                     <CreateTechnician
                         technician={technicianSelected}
-                        isOpen={openCreate()}
-                        onClose={closeCreate()}
+                        isOpen={isCreateOpen}
+                        onClose={closeCreate}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postTechnician}
@@ -233,17 +233,17 @@ export const Technician = () => {
                     />
                     <EditTechnician
                         technician={technicianSelected}
-                        isOpen={openEdit()}
+                        isOpen={isEditOpen}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
-                        onClose={closeEdit()}
+                        onClose={closeEdit}
                         onSubmit={putTechnician}
                         errors={errors}
                     />
                     <DeleteTechnician
                         technician={technicianSelected}
-                        isOpen={openDelete()}
-                        onClose={closeDelete()}
+                        isOpen={isDeleteOpen}
+                        onClose={closeDelete}
                         isSubmitting={isSubmitting}
                         onConfirm={deleteTechnician}
                     />

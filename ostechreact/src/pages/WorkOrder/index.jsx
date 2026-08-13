@@ -266,8 +266,8 @@ export const WorkOrder = () => {
                         customers={customers}
                         categories={categories}
                         equipments={equipments}
-                        isOpen={openCreate()}
-                        onClose={closeCreate()}
+                        isOpen={isCreateOpen}
+                        onClose={closeCreate}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postWorkOrder}
@@ -280,17 +280,18 @@ export const WorkOrder = () => {
                         customers={customers}
                         categories={categories}
                         equipments={equipments}
-                        isOpen={openEdit()}
-                        onClose={closeEdit()}
+                        isOpen={isEditOpen}
+                        onClose={closeEdit}
                         onChange={handleChange}
                         isSubmitting={isSubmitting}
                         onSubmit={putWorkOrder}
                         errors={errors}
                     />
+
                     <DeleteWorkOrder
                         workOrder={workOrderSelected}
-                        isOpen={openDelete()}
-                        onClose={closeDelete()}
+                        isOpen={isDeleteOpen}
+                        onClose={closeDelete}
                         isSubmitting={isSubmitting}
                         onConfirm={deleteWorkOrder}
                     />

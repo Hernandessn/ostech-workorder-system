@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import { validateCategory } from '../../validations/categoryValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useRequestState } from '../../hooks/useRequestState';
+import { useModals } from '../../hooks/useModals';
 
 export const Category = () => {
     const {
@@ -233,8 +234,8 @@ export const Category = () => {
                                 </ul>
                                 <CreateCategory
                                     category={categorySelected}
-                                    isOpen={openCreate()}
-                                    onClose={closeCreate()}
+                                    isOpen={isCreateOpen}
+                                    onClose={closeCreate}
                                     onChange={handleChange}
                                     isSubmitting={isSubmitting}
                                     onSubmit={postCategory}
@@ -242,8 +243,8 @@ export const Category = () => {
                                 />
                                 <EditCategory
                                     category={categorySelected}
-                                    isOpen={openEdit()}
-                                    onClose={closeEdit()}
+                                    isOpen={isEditOpen}
+                                    onClose={closeEdit}
                                     onChange={handleChange}
                                     isSubmitting={isSubmitting}
                                     onSubmit={putCategory}
@@ -251,8 +252,8 @@ export const Category = () => {
                                 />
                                 <DeleteCategory
                                     category={categorySelected}
-                                    isOpen={openDelete()}
-                                    onClose={closeDelete()}
+                                    isOpen={isDeleteOpen}
+                                    onClose={closeDelete}
                                     isSubmitting={isSubmitting}
                                     onConfirm={deleteCategory}
                                 />

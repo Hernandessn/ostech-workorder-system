@@ -220,8 +220,8 @@ export const Equipment = () => {
                     </ul>
                     <CreateEquipment
                         equipment={equipmentSelected}
-                        isOpen={openCreate()}
-                        onClose={closeCreate()}
+                        isOpen={isCreateOpen}
+                        onClose={closeCreate}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postEquipment}
@@ -229,8 +229,8 @@ export const Equipment = () => {
                     />
                     <EditEquipment
                         equipment={equipmentSelected}
-                        isOpen={openEdit()}
-                        onClose={closeEdit()}
+                        isOpen={isEditOpen}
+                        onClose={closeEdit}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={putEquipment}
@@ -238,8 +238,8 @@ export const Equipment = () => {
                     />
                     <DeleteEquipment
                         equipment={equipmentSelected}
-                        isOpen={openDelete()}
-                        onClose={closeDelete()}
+                        isOpen={isDeleteOpen}
+                        onClose={closeDelete}
                         isSubmitting={isSubmitting}
                         onConfirm={deleteEquipment}
                     />

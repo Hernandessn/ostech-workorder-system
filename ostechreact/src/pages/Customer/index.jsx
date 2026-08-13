@@ -222,8 +222,8 @@ export const Customer = () => {
                     </ul>
                     <CreateCustomer
                         customer={customerSelected}
-                        isOpen={openCreate()}
-                        onClose={closeCreate()}
+                        isOpen={isCreateOpen}
+                        onClose={closeCreate}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={postCustomer}
@@ -231,8 +231,8 @@ export const Customer = () => {
                     />
                     <EditCustomer
                         customer={customerSelected}
-                        isOpen={openEdit()}
-                        onClose={closeEdit()}
+                        isOpen={isEditOpen}
+                        onClose={closeEdit}
                         isSubmitting={isSubmitting}
                         onChange={handleChange}
                         onSubmit={putCustomer}
@@ -240,9 +240,9 @@ export const Customer = () => {
                     />
                     <DeleteCustomer
                         customer={customerSelected}
-                        isOpen={openDelete()}
+                        isOpen={isDeleteOpen}
                         isSubmitting={isSubmitting}
-                        onClose={closeDelete()}
+                        onClose={closeDelete}
                         onConfirm={deleteCustomer}
                     />
                 </section>
