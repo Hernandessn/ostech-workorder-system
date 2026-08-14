@@ -40,7 +40,6 @@ A aplicação cobre operações completas de **CRUD**, relacionamentos entre ent
 ### Dashboard
 - Totais por entidade: clientes, técnicos, equipamentos, categorias, ordens de serviço
 - Ordens de serviço por status
-- *(A ver: confirmar se o bloco de "ordens de serviço mais recentes" está de fato implementado antes de divulgar.)*
 
 ### Categorias / Clientes / Equipamentos / Técnicos
 - Listagem com TanStack Query
