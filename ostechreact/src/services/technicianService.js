@@ -1,11 +1,25 @@
 import api from "./api";
 
 export const technicianService = {
-    getAll: () => api.get("/technician"),
+    getAll: async () => {
+        const response = await api.get("/technician");
 
-    create: (data) => api.post("/technician", data),
+        return response.data;
+    },
 
-    update: (id, data) => api.put(`/technician/${id}`, data),
+    create: async (data) => {
+        const response = await api.post("/technician", data);
+        
+        return response.data;
+    },
 
-    delete: (id) => api.delete(`/technician/${id}`)
+    update: async (id, data) => {
+        const response = await api.put(`/technician/${id}`, data);
+
+        return response.data;
+    },
+
+    delete: async (id) => {
+        await api.delete(`/technician/${id}`)
+    }
 };

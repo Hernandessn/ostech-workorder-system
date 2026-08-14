@@ -1,5 +1,3 @@
-import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react';
-import logoOstech from '../../assets/logo-ostech.png';
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 
@@ -16,15 +14,12 @@ import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useRequestState } from '../../hooks/useRequestState.js';
 import { useModals } from '../../hooks/useModals.js';
 import { technicianService } from '../../services/technicianService.js';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 
 export const Technician = () => {
     const {
-        isLoading,
-        setIsLoading,
-        isSubmitting,
         setIsSubmitting,
-        isError,
-        setIsError,
         errors,
         setErrors
     } = useRequestState();
@@ -41,7 +36,7 @@ export const Technician = () => {
         closeDelete
     } = useModals();
 
-    const [technician, setTechnician] = useState([]);
+    const queryClient = useQueryClient();
 
     const [technicianSelected, setTechnicianSelected] = useState({
         technicianId: '',
@@ -60,6 +55,40 @@ export const Technician = () => {
         });
     };
 
+    
+        const handleCreateTechnician = () => {
+            const validationErrors = validateTechnician(technicianSelected);
+    
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
+    
+            setErrors({});
+    
+            createTechnicianMutation.mutate({
+                name: technicianSelected.name,
+                specialty: technicianSelected.specialty,
+                contact: technicianSelected.contact,
+                availability: technicianSelected.availability,
+                hiringDate: technicianSelected.hiringDate
+            });
+        };
+    
+        const handleUpdateTechnician = () => {
+            updateTechnicianMutation.mutate({
+                id: technicianSelected.technicianId,
+                data: technicianSelected
+            });
+        };
+    
+        const handleDeleteTechnician = () => {
+            deleteTechnicianMutation.mutate(
+                technicianSelected.technicianId
+            );
+        };
+    
+
     const clearTechnicianSelected = () => {
         setTechnicianSelected({
             technicianId: '',
@@ -71,106 +100,77 @@ export const Technician = () => {
         });
     };
 
-    const getTechnician = async () => {
-        setIsError(false);
-        setIsLoading(true);
-        try {
-            const response = await technicianService.getAll();
+    const {
+        data: technician = [],
+        isLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ["technicians"],
+        queryFn: technicianService.getAll
+    });
 
-            setTechnician(response.data);
-        } catch (error) {
-            setIsError(true);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    const postTechnician = async () => {
-        try {
-            const validationErrors = validateTechnician(technicianSelected);
-
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
-
-            const response = await technicianService.create({
-                name: technicianSelected.name,
-                specialty: technicianSelected.specialty,
-                contact: technicianSelected.contact,
-                availability: technicianSelected.availability,
-                hiringDate: technicianSelected.hiringDate
+    const createTechnicianMutation = useMutation({
+        mutationFn: technicianService.create,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["technicians"]
             });
 
-            setTechnician(prev => [...prev, response.data]);
-
-            clearTechnicianSelected();
             closeCreate();
+            clearTechnicianSelected();
+
             toast.success("Técnico criado com sucesso!");
-        } catch (error) {
+        },
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
         }
-    }
+    });
 
-    const putTechnician = async () => {
-        try {
-            const validationErrors = validateTechnician(technicianSelected);
+    const updateTechnicianMutation = useMutation({
+        mutationFn: ({ id, data }) =>
+            technicianService.update(id, data),
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["technicians"]
+            });
 
-            const response = await technicianService.update(technicianSelected.technicianId, technicianSelected);
-
-            setTechnician(prev =>
-                prev.map(item =>
-                    item.technicianId === technicianSelected.technicianId
-                        ? response.data
-                        : item
-                )
-            );
-
-            clearTechnicianSelected();
             closeEdit();
-            toast.success("Atualizações salvas com sucesso!");
-        } catch (error) {
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
-    const deleteTechnician = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await technicianService.delete(technicianSelected.technicianId);
-
-            setTechnician(prev =>
-                prev.filter(item =>
-                    item.technicianId !== technicianSelected.technicianId
-                )
-            );
-
             clearTechnicianSelected();
-            closeDelete();
-            toast.success("Técnico deletado com sucesso!");
-        } catch (error) {
+
+            toast.success("Atualizações salvas com sucesso!");
+        },
+
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsLoading(false);
         }
-    }
+    });
+
+    const deleteTechnicianMutation = useMutation({
+        mutationFn: technicianService.delete,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["technicians"]
+            });
+
+            closeDelete();
+            clearTechnicianSelected();
+
+            toast.success("Técnico deletedo com sucesso!");
+        },
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
+
+
     useEffect(() => {
-        getTechnician();
-    }, []);
+        if (isError) {
+            toast.error(getApiErrorMessage(error));
+        }
+    }, [isError, error]);
 
     return (
         <Container>
@@ -224,26 +224,26 @@ export const Technician = () => {
                         technician={technicianSelected}
                         isOpen={isCreateOpen}
                         onClose={closeCreate}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={createTechnicianMutation.isPending}
                         onChange={handleChange}
-                        onSubmit={postTechnician}
+                        onSubmit={handleCreateTechnician}
                         errors={errors}
                     />
                     <EditTechnician
                         technician={technicianSelected}
                         isOpen={isEditOpen}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={updateTechnicianMutation.isPending}
                         onChange={handleChange}
                         onClose={closeEdit}
-                        onSubmit={putTechnician}
+                        onSubmit={handleUpdateTechnician}
                         errors={errors}
                     />
                     <DeleteTechnician
                         technician={technicianSelected}
                         isOpen={isDeleteOpen}
                         onClose={closeDelete}
-                        isSubmitting={isSubmitting}
-                        onConfirm={deleteTechnician}
+                        isSubmitting={deleteTechnicianMutation.isPending}
+                        onConfirm={handleDeleteTechnician}
                     />
                 </section>
             )}

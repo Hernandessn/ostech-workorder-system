@@ -1,11 +1,25 @@
 import api from "./api";
 
 export const workOrderService = {
-    getAll: () => api.get("/workOrder"),
+    getAll: async () => {
+        const response = await api.get("/workOrder");
 
-    create: (data) => api.post("/workOrder", data),
+        return response.data;
+    },
 
-    update: (id, data) => api.put(`/workOrder/${id}`, data),
+    create: async (data) => {
+        const response = await api.post("/workOrder", data);
 
-    delete: (id) => api.delete(`/workOrder/${id}`)
+        return response.data;
+    },
+
+    update: async (id, data) => {
+        const response = await api.put(`/workOrder/${id}`, data);
+
+        return response.data;
+    },
+
+    delete: async (id) => {
+        await api.delete(`/workOrder/${id}`)
+    }
 };

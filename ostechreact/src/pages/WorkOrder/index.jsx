@@ -14,15 +14,11 @@ import { useRequestState } from '../../hooks/useRequestState';
 import { useModals } from '../../hooks/useModals';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { workOrderService } from '../../services/workOrderService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const WorkOrder = () => {
     const {
-        isLoading,
-        setIsLoading,
-        isSubmitting,
         setIsSubmitting,
-        isError,
-        setIsError,
         errors,
         setErrors
     } = useRequestState();
@@ -39,7 +35,7 @@ export const WorkOrder = () => {
         closeDelete
     } = useModals();
 
-    const [workOrder, setWorkOrder] = useState([]);
+    const queryClient = useQueryClient();
 
     const [technicians, setTechnicians] = useState([]);
     const [customers, setCustomers] = useState([]);
@@ -84,114 +80,110 @@ export const WorkOrder = () => {
         console.log(workOrderSelected);
     }
 
-    const getWorkOrder = async () => {
-        setIsError(false);
-        setIsLoading(true);
-        try {
-            const response = await workOrderService.getAll();
+    const handleCreateWorkOrder = () => {
+        const validationErrors = validateWorkOrder(workOrderSelected);
 
-            console.log(response.data);
-
-            setWorkOrder(response.data);
-        } catch (error) {
-
-            setIsError(true);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsLoading(false);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
         }
-    }
 
-    const postWorkOrder = async () => {
-        try {
-            const validationErrors = validateWorkOrder(workOrderSelected);
+        setErrors({});
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
+        createWorkOrderMutation.mutate({
+            title: workOrderSelected.title,
+            description: workOrderSelected.description,
+            amount: workOrderSelected.amount,
+            deadline: workOrderSelected.deadline,
+            openingDate: workOrderSelected.openingDate,
+            status: workOrderSelected.status,
+            technicianId: workOrderSelected.technicianId,
+            customerId: workOrderSelected.customerId,
+            categoryId: workOrderSelected.categoryId,
+            equipmentId: workOrderSelected.equipmentId,
+        });
+    };
 
-            setErrors({});
-            setIsSubmitting(true);
+    const handleUpdateWorkOrder = () => {
+        updateWorkOrderMutation.mutate({
+            id: workOrderSelected.workOrderId,
+            data: workOrderSelected
+        });
+    };
 
+    const handleDeleteWorkOrder = () => {
+        deleteWorkOrderMutation.mutate(
+            workOrderSelected.workOrderId
+        );
+    };
 
-            const response = await workOrderService.create({
-                title: workOrderSelected.title,
-                description: workOrderSelected.description,
-                amount: workOrderSelected.amount,
-                deadline: workOrderSelected.deadline,
-                openingDate: workOrderSelected.openingDate,
-                status: workOrderSelected.status,
-                technicianId: workOrderSelected.technicianId,
-                customerId: workOrderSelected.customerId,
-                categoryId: workOrderSelected.categoryId,
-                equipmentId: workOrderSelected.equipmentId,
+    const {
+        data: workOrder = [],
+        isLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ["workOrders"],
+        queryFn: workOrderService.getAll
+    });
+
+    const createWorkOrderMutation = useMutation({
+        mutationFn: workOrderService.create,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["workOrders"]
             });
 
-            setWorkOrder(prev => [...prev, response.data]);
-
-            clearWorkOrderSelected();
             closeCreate();
+            clearWorkOrderSelected();
+
             toast.success("Ordem de serviço criada com sucesso!");
-        } catch (error) {
+        },
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
         }
-    }
+    });
 
-    const putWorkOrder = async () => {
-        try {
-            const validationErrors = validateWorkOrder(workOrderSelected);
+    const updateWorkOrderMutation = useMutation({
+        mutationFn: ({ id, data }) =>
+            workOrderService.update(id, data),
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["workOrders"]
+            });
 
-            setErrors({});
-            setIsSubmitting(true);
-
-            const response = await workOrderService.update(workOrderSelected.workOrderId, workOrderSelected);
-
-            setWorkOrder(prev =>
-                prev.map(item =>
-                    item.workOrderId == workOrderSelected.workOrderId
-                        ? response.data
-                        : item
-                )
-            );
-
-            clearWorkOrderSelected();
             closeEdit();
-            toast.success("Atualizações salvas com sucesso!");
-        } catch (error) {
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
-    const deleteWorkOrder = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await workOrderService.delete(workOrderSelected.workOrderId);
-
-            setWorkOrder(prev =>
-                prev.filter(item =>
-                    item.workOrderId !== workOrderSelected.workOrderId
-                )
-            );
-
             clearWorkOrderSelected();
-            closeDelete(false);
-            toast.success("Ordem de serviço deletedo com sucesso!");
-        } catch (error) {
+
+            toast.success("Atualizações salvas com sucesso!");
+        },
+
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
         }
-    }
+    });
+
+    const deleteWorkOrderMutation = useMutation({
+        mutationFn: workOrderService.delete,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["workOrders"]
+            });
+
+            closeDelete();
+            clearWorkOrderSelected();
+
+            toast.success("Ordem de serviço deletedo com sucesso!");
+        },
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
+
+
+
     useEffect(() => {
         const loadOptions = async () => {
             const [techRes, custRes, catRes, equipRes] = await Promise.all([
@@ -209,8 +201,10 @@ export const WorkOrder = () => {
     }, []);
 
     useEffect(() => {
-        getWorkOrder();
-    }, [])
+        if (isError) {
+            toast.error(getApiErrorMessage(error));
+        }
+    }, [isError, error]);
 
     return (
         <Container>
@@ -269,9 +263,9 @@ export const WorkOrder = () => {
                         equipments={equipments}
                         isOpen={isCreateOpen}
                         onClose={closeCreate}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={createWorkOrderMutation.isPending}
                         onChange={handleChange}
-                        onSubmit={postWorkOrder}
+                        onSubmit={handleCreateWorkOrder}
                         errors={errors}
                     />
 
@@ -284,8 +278,8 @@ export const WorkOrder = () => {
                         isOpen={isEditOpen}
                         onClose={closeEdit}
                         onChange={handleChange}
-                        isSubmitting={isSubmitting}
-                        onSubmit={putWorkOrder}
+                        isSubmitting={updateWorkOrderMutation.isPending}
+                        onSubmit={handleUpdateWorkOrder}
                         errors={errors}
                     />
 
@@ -293,8 +287,8 @@ export const WorkOrder = () => {
                         workOrder={workOrderSelected}
                         isOpen={isDeleteOpen}
                         onClose={closeDelete}
-                        isSubmitting={isSubmitting}
-                        onConfirm={deleteWorkOrder}
+                        isSubmitting={deleteWorkOrderMutation.isPending}
+                        onConfirm={handleDeleteWorkOrder}
                     />
                 </section>
 

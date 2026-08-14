@@ -1,11 +1,25 @@
 import api from "./api";
 
 export const equipmentService = {
-    getAll: () => api.get("/equipment"),
+    getAll: async () => {
+        const response = await api.get("/equipment");
 
-    create: (data) => api.post("/equipment", data),
+        return response.data;
+    },
 
-    update: (id, data) => api.put(`/equipment/${id}`, data),
+    create: async (data) => {
+        const response = await api.post("/equipment", data)
 
-    delete: (id) => api.delete(`/equipment/${id}`)
+        return response.data;
+    },
+
+    update: async (id, data) => {
+        const response = await api.put(`/equipment/${id}`, data);
+
+        return response.data;
+    },
+
+    delete: async (id) => {
+        await api.delete(`/equipment/${id}`)
+    }
 };

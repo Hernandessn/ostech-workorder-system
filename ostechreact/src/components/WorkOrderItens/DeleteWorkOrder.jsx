@@ -10,7 +10,7 @@ export const DeleteWorkOrder = ({
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Delete workOrder">
             <p className="mb-4">
-                Are you sure you want to delete <strong className="text-[#6EACDA]">{workOrder.name}</strong>?
+                Are you sure you want to delete <strong className="text-[#6EACDA]">{workOrder.title}</strong>?
             </p>
             <div className="flex justify-end gap-2">
                 <button

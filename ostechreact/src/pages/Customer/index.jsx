@@ -15,15 +15,11 @@ import { getApiErrorMessage } from '../../utils/apiError';
 import { useRequestState } from '../../hooks/useRequestState';
 import { useModals } from '../../hooks/useModals';
 import { customerService } from '../../services/customerService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const Customer = () => {
     const {
-        isLoading,
-        setIsLoading,
-        isSubmitting,
         setIsSubmitting,
-        isError,
-        setIsError,
         errors,
         setErrors
     } = useRequestState();
@@ -40,6 +36,8 @@ export const Customer = () => {
         closeDelete
     } = useModals();
 
+    const queryClient = useQueryClient();
+
     const [customerSelected, setCustomerSelected] = useState({
         customerId: '',
         name: '',
@@ -48,8 +46,6 @@ export const Customer = () => {
         document: ''
     });
 
-    const [customer, setCustomer] = useState([]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCustomerSelected({
@@ -57,8 +53,38 @@ export const Customer = () => {
             [name]: value
         });
         console.log(customerSelected);
+    };
 
-    }
+ const handleCreateCustomer = () => {
+        const validationErrors = validateCustomer(customerSelected);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setErrors({});
+
+        createCustomerMutation.mutate({
+            name: customerSelected.name,
+            email: customerSelected.email,
+            phone: customerSelected.phone,
+            document: customerSelected.document
+        });
+    };
+
+    const handleUpdateCustomer = () => {
+        updateCustomerMutation.mutate({
+            id: customerSelected.customerId,
+            data: customerSelected
+        });
+    };
+
+    const handleDeleteCustomer = () => {
+        deleteCustomerMutation.mutate(
+            customerSelected.customerId
+        );
+    };
 
     const clearCustomerSelected = () => {
         setCustomerSelected({
@@ -69,107 +95,78 @@ export const Customer = () => {
             document: ''
         });
     };
-    const getCustomer = async () => {
-        setIsError(false);
-        setIsLoading(true);
-        try {
-            const response = await customerService.getAll();
 
-            setCustomer(response.data);
-        } catch (error) {
-            setIsError(true);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsLoading(false);
-        }
-    }
-    const postCustomer = async () => {
-        try {
-            const validationErrors = validateCustomer(customerSelected);
+   
+    const {
+        data: customer = [],
+        isLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ["customers"],
+        queryFn: customerService.getAll
+    });
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
-
-            const response = await customerService.create({
-                name: customerSelected.name,
-                email: customerSelected.email,
-                phone: customerSelected.phone,
-                document: customerSelected.document
+    const createCustomerMutation = useMutation({
+        mutationFn: customerService.create,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["customers"]
             });
-            setCustomer(prev => [...prev, response.data]);
 
-            clearCustomerSelected();
             closeCreate();
+            clearCustomerSelected();
+
             toast.success("Cliente criado com sucesso!");
-        } catch (error) {
+        },
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
         }
-    }
+    });
 
-    const putCustomer = async () => {
-        try {
-            const validationErrors = validateCustomer(customerSelected);
+    const updateCustomerMutation = useMutation({
+        mutationFn: ({ id, data }) =>
+            customerService.update(id, data),
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
-            const response = await customerService.update(
-                customerSelected.customerId,
-                customerSelected
-            );
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["customers"]
+            });
 
-            setCustomer(prev =>
-                prev.map(item =>
-                    item.customerId === response.data.customerId
-                        ? response.data
-                        : item
-                )
-            );
-
-            clearCustomerSelected();
             closeEdit();
-            toast.success("Atualizações salvas com sucesso!");
-        } catch (error) {
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const deleteCustomer = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await customerService.delete(customerSelected.customerId);
-
-            setCustomer(prev =>
-                prev.filter(
-                    item =>
-                        item.customerId !== customerSelected.customerId
-                )
-            );
-
             clearCustomerSelected();
-            closeDelete();
-            toast.success("Cliente deletedo com sucesso!");
-        } catch (error) {
+
+            toast.success("Atualizações salvas com sucesso!");
+        },
+
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
         }
-    }
+    });
+
+    const deleteCustomerMutation = useMutation({
+        mutationFn: customerService.delete,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["customers"]
+            });
+
+            closeDelete();
+            clearCustomerSelected();
+
+            toast.success("Cliente deletedo com sucesso!");
+        },
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
 
     useEffect(() => {
-        getCustomer();
-    }, []);
+        if (isError) {
+            toast.error(getApiErrorMessage(error));
+        }
+    }, [isError, error]);
 
     return (
         <Container>
@@ -222,26 +219,26 @@ export const Customer = () => {
                         customer={customerSelected}
                         isOpen={isCreateOpen}
                         onClose={closeCreate}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={createCustomerMutation.isPending}
                         onChange={handleChange}
-                        onSubmit={postCustomer}
+                        onSubmit={handleCreateCustomer}
                         errors={errors}
                     />
                     <EditCustomer
                         customer={customerSelected}
                         isOpen={isEditOpen}
                         onClose={closeEdit}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={updateCustomerMutation.isPending}
                         onChange={handleChange}
-                        onSubmit={putCustomer}
+                        onSubmit={handleUpdateCustomer}
                         errors={errors}
                     />
                     <DeleteCustomer
                         customer={customerSelected}
                         isOpen={isDeleteOpen}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={deleteCustomerMutation.isPending}
                         onClose={closeDelete}
-                        onConfirm={deleteCustomer}
+                        onConfirm={handleDeleteCustomer}
                     />
                 </section>
             )}

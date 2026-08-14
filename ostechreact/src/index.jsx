@@ -3,11 +3,15 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import AppRoutes from './routes';
 import { ToastContainer } from 'react-toastify';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './index.css';
+
+const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
     <AppRoutes />
     <ToastContainer
       position="top-right"
@@ -18,5 +22,6 @@ root.render(
       }
       progressClassName="bg-[#6EACDA]"
     />
+    </QueryClientProvider>
   </React.StrictMode>
 );

@@ -14,15 +14,11 @@ import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useRequestState } from '../../hooks/useRequestState.js';
 import { useModals } from '../../hooks/useModals.js';
 import { equipmentService } from '../../services/equipmentService.js';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const Equipment = () => {
     const {
-        isLoading,
-        setIsLoading,
-        isSubmitting,
         setIsSubmitting,
-        isError,
-        setIsError,
         errors,
         setErrors
     } = useRequestState();
@@ -39,6 +35,8 @@ export const Equipment = () => {
         closeDelete
     } = useModals();
 
+    const queryClient = useQueryClient();
+
     const [equipmentSelected, setEquipmentSelected] = useState({
         equipmentId: '',
         name: '',
@@ -46,8 +44,6 @@ export const Equipment = () => {
         model: '',
         serialNumber: ''
     });
-
-    const [equipment, setEquipment] = useState([]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -68,107 +64,108 @@ export const Equipment = () => {
         });
     };
 
-    const getEquipment = async () => {
-        setIsError(false);
-        setIsLoading(true);
-        try {
-            const response = await equipmentService.getAll();
 
-            setEquipment(response.data);
-        } catch (error) {
-            setIsError(true);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsLoading(false);
+    const handleCreateEquipment = () => {
+        const validationErrors = validateEquipment(equipmentSelected);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
         }
-    }
 
-    const postEquipment = async () => {
-        try {
-            const validationErrors = validateEquipment(equipmentSelected);
+        setErrors({});
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
-
-            const response = await equipmentService.create({
-                name: equipmentSelected.name,
-                brand: equipmentSelected.brand,
-                model: equipmentSelected.model,
-                serialNumber: equipmentSelected.serialNumber
-            });
-            setEquipment(prev => [...prev, response.data]);
-
-            clearEquipmentSelected();
-            closeCreate();
-            toast.success("Equipamento criado com sucesso!");
-        } catch (error) {
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
-    const putEquipment = async () => {
-        try {
-            const validationErrors = validateEquipment(equipmentSelected);
-
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-
-            setErrors({});
-            setIsSubmitting(true);
-
-            const response = await equipmentService.update(equipmentSelected.equipmentId, equipmentSelected);
-
-            setEquipment(prev =>
-                prev.map(
-                    item => item.equipmentId === response.data.equipmentId
-                        ? response.data
-                        : item
-                )
-            );
-
-            clearEquipmentSelected();
-            closeEdit();
-            toast.success("Atualizações salvas com sucesso!");
-        } catch (error) {
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
+        createEquipmentMutation.mutate({
+            name: equipmentSelected.name,
+            brand: equipmentSelected.brand,
+            model: equipmentSelected.model,
+            serialNumber: equipmentSelected.serialNumber
+        });
     };
 
+    const handleUpdateEquipment = () => {
+        updateEquipmentMutation.mutate({
+            id: equipmentSelected.equipmentId,
+            data: equipmentSelected
+        });
+    };
 
-    const deleteEquipment = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await equipmentService.delete(equipmentSelected.equipmentId);
+    const handleDeleteEquipment = () => {
+        deleteEquipmentMutation.mutate(
+            equipmentSelected.equipmentId
+        );
+    };
 
-            setEquipment(prev =>
-                prev.filter(
-                    item =>
-                        item.equipmentId !== equipmentSelected.equipmentId
-                )
-            );
+    const {
+        data: equipment = [],
+        isLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ["equipments"],
+        queryFn: equipmentService.getAll
+    });
 
+    const createEquipmentMutation = useMutation({
+        mutationFn: equipmentService.create,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["equipments"]
+            });
+
+            closeCreate();
             clearEquipmentSelected();
-            closeDelete();
-            toast.success("Equipamento deletado com sucesso!");
-        } catch (error) {
+
+            toast.success("Equipamento criado com sucesso!");
+        },
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
         }
-    }
+    });
+
+    const updateEquipmentMutation = useMutation({
+        mutationFn: ({ id, data }) =>
+            equipmentService.update(id, data),
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["equipments"]
+            });
+
+            closeEdit();
+            clearEquipmentSelected();
+
+            toast.success("Atualizações salvas com sucesso!");
+        },
+
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
+
+    const deleteEquipmentMutation = useMutation({
+        mutationFn: equipmentService.delete,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["equipments"]
+            });
+
+            closeDelete();
+            clearEquipmentSelected();
+
+            toast.success("Equipamento deletado com sucesso!");
+        },
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
+
     useEffect(() => {
-        getEquipment();
-    }, []);
+        if (isError) {
+            toast.error(getApiErrorMessage(error));
+        }
+    }, [isError, error]);
 
     return (
         <Container>
@@ -223,26 +220,26 @@ export const Equipment = () => {
                         equipment={equipmentSelected}
                         isOpen={isCreateOpen}
                         onClose={closeCreate}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={createEquipmentMutation.isPending}
                         onChange={handleChange}
-                        onSubmit={postEquipment}
+                        onSubmit={handleCreateEquipment}
                         errors={errors}
                     />
                     <EditEquipment
                         equipment={equipmentSelected}
                         isOpen={isEditOpen}
                         onClose={closeEdit}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={updateEquipmentMutation.isPending}
                         onChange={handleChange}
-                        onSubmit={putEquipment}
+                        onSubmit={handleUpdateEquipment}
                         errors={errors}
                     />
                     <DeleteEquipment
                         equipment={equipmentSelected}
                         isOpen={isDeleteOpen}
                         onClose={closeDelete}
-                        isSubmitting={isSubmitting}
-                        onConfirm={deleteEquipment}
+                        isSubmitting={deleteEquipmentMutation.isPending}
+                        onConfirm={handleDeleteEquipment}
                     />
                 </section>
             )}

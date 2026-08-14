@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, } from 'react';
 import { Loading } from '../../components/Loading';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
@@ -15,15 +14,11 @@ import { getApiErrorMessage } from '../../utils/apiError';
 import { useRequestState } from '../../hooks/useRequestState';
 import { useModals } from '../../hooks/useModals';
 import { categoryService } from '../../services/categoryService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const Category = () => {
     const {
-        isLoading,
-        setIsLoading,
-        isSubmitting,
         setIsSubmitting,
-        isError,
-        setIsError,
         errors,
         setErrors
     } = useRequestState();
@@ -46,7 +41,7 @@ export const Category = () => {
         description: ''
     });
 
-    const [category, setCategory] = useState([]);
+    const queryClient = useQueryClient();
 
     const handleChange = e => {
         const { name, value } = e.target;
@@ -57,126 +52,115 @@ export const Category = () => {
         console.log(categorySelected);
     };
 
+    const handleCreateCategory = () => {
+        const validationErrors = validateCategory(categorySelected);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setErrors({});
+        createCategoryMutation.mutate({
+            name: categorySelected.name,
+            description: categorySelected.description
+        });
+    };
+
+    const handleUpdateCategory = () => {
+        updateCategoryMutation.mutate({
+            id: categorySelected.categoryId,
+            data: categorySelected
+        });
+    };
+
+    const handleDeleteCategory = () => {
+        deleteCategoryMutation.mutate(
+            categorySelected.categoryId
+        );
+    };
+
     const clearCategorySelected = () => {
         setCategorySelected({
             categoryId: '',
             name: '',
             description: ''
         });
-
-    }
-
-    const getCategory = async () => {
-        setIsError(false);
-        setIsLoading(true);
-        try {
-            const response = await categoryService.getAll();
-
-            setCategory(response.data);
-        } catch (error) {
-
-            setIsError(true);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsLoading(false);
-        }
     };
 
-    const postCategory = async () => {
-        try {
-            const validationErrors = validateCategory(categorySelected);
+    const {
+        data: category = [],
+        isLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ["categories"],
+        queryFn: categoryService.getAll
+    });
 
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
 
-            const response = await categoryService.create({
-                name: categorySelected.name,
-                description: categorySelected.description
+    const createCategoryMutation = useMutation({
+        mutationFn: categoryService.create,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["categories"]
             });
 
-            setCategory(prev => [...prev, response.data]);
-
-            setCategorySelected({
-                categoryId: '',
-                name: '',
-                description: ''
-            });
-
-            clearCategorySelected();
             closeCreate();
-            toast.success("Categoria criada com sucesso!")
-        } catch (error) {
-            console.log(error);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const putCategory = async () => {
-        try {
-            const validationErrors = validateCategory(categorySelected);
-
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-            setErrors({});
-            setIsSubmitting(true);
-
-            const response = await categoryService.update(
-                categorySelected.categoryId,
-                categorySelected
-            );
-
-            setCategory(prev =>
-                prev.map(item =>
-                    item.categoryId === response.data.categoryId
-                        ? response.data
-                        : item
-                )
-            );
             clearCategorySelected();
+
+            toast.success("Categoria criada com sucesso!");
+        },
+
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
+
+    const updateCategoryMutation = useMutation({
+        mutationFn: ({ id, data }) =>
+            categoryService.update(id, data),
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["categories"]
+            });
+
             closeEdit();
-            toast.success("Atualizações salvas com sucesso!");
-        } catch (error) {
-            console.log(error);
-            toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-    const deleteCategory = async () => {
-        setIsSubmitting(true);
-        try {
-            await categoryService.delete(categorySelected.categoryId);
-
-            setCategory(prev =>
-                prev.filter(
-                    item =>
-                        item.categoryId !== categorySelected.categoryId
-                )
-            );
             clearCategorySelected();
-            closeDelete();
-            toast.success("Categoria deletada com sucesso!");
-        } catch (error) {
-            console.log(error);
+
+            toast.success("Atualizações salvas com sucesso!");
+        },
+
+        onError: (error) => {
             toast.error(getApiErrorMessage(error));
-        } finally {
-            setIsSubmitting(false)
         }
-    };
+    });
+
+    const deleteCategoryMutation = useMutation({
+        mutationFn: categoryService.delete,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["categories"]
+            });
+
+            closeDelete();
+            clearCategorySelected();
+
+            toast.success("Categoria deletada com sucesso!");
+        },
+
+        onError: (error) => {
+            toast.error(getApiErrorMessage(error));
+        }
+    });
 
     useEffect(() => {
-        getCategory();
-    }, []);
-
-
+        if (isError) {
+            toast.error(getApiErrorMessage(error));
+        }
+    }, [isError, error]);
 
     return (
         <Container>
@@ -234,8 +218,8 @@ export const Category = () => {
                                     isOpen={isCreateOpen}
                                     onClose={closeCreate}
                                     onChange={handleChange}
-                                    isSubmitting={isSubmitting}
-                                    onSubmit={postCategory}
+                                    isSubmitting={createCategoryMutation.isPending}
+                                    onSubmit={handleCreateCategory}
                                     errors={errors}
                                 />
                                 <EditCategory
@@ -243,16 +227,16 @@ export const Category = () => {
                                     isOpen={isEditOpen}
                                     onClose={closeEdit}
                                     onChange={handleChange}
-                                    isSubmitting={isSubmitting}
-                                    onSubmit={putCategory}
+                                    isSubmitting={updateCategoryMutation.isPending}
+                                    onSubmit={handleUpdateCategory}
                                     errors={errors}
                                 />
                                 <DeleteCategory
                                     category={categorySelected}
                                     isOpen={isDeleteOpen}
                                     onClose={closeDelete}
-                                    isSubmitting={isSubmitting}
-                                    onConfirm={deleteCategory}
+                                    isSubmitting={deleteCategoryMutation.isPending}
+                                    onConfirm={handleDeleteCategory}
                                 />
                             </section>
                         )
