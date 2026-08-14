@@ -7,12 +7,14 @@ import { Equipment } from "./pages/Equipment";
 import { WorkOrder } from "./pages/WorkOrder";
 import { Technician } from "./pages/Technician";
 import { NotFound } from "./pages/NotFound";
+import { Dashboard } from './pages/Dashboard';
 
 export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
                 <Route path="/" exact Component={Home} />
+                <Route path="/dashboard" Component={Dashboard} />
                 <Route path="/categories" exact Component={Category} />
                 <Route path="/customers" Component={Customer} />
                 <Route path="/equipments" Component={Equipment} />
