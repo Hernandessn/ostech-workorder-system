@@ -1,8 +1,8 @@
 # OSTech — React
 
-Frontend da plataforma **OSTech**, um sistema de gerenciamento de ordens de serviço desenvolvido com React e integrado a uma API REST em ASP.NET Core.
+Frontend for the **OSTech** platform, a service order management system built with React and integrated with a REST API in ASP.NET Core.
 
-Projeto construído para consolidar conceitos de React, consumo de APIs com TanStack Query, componentização, validação, responsividade e organização de uma aplicação frontend.
+Built to consolidate concepts in React, API consumption with TanStack Query, componentization, validation, responsiveness, and frontend application organization.
 
 ---
 
@@ -11,63 +11,64 @@ Projeto construído para consolidar conceitos de React, consumo de APIs com TanS
 ### Dashboard
 ![Dashboard](./docs/screenshots/dashboard.png)
 
-### Ordens de Serviço
+### Work Orders
 ![WorkOrder](./docs/screenshots/workorder.png)
 
-### Listagem de Clientes
+### Customer List
 ![Customers](./docs/screenshots/customers.png)
 
-### Responsivo — Mobile
+### Responsive — Mobile
 ![Mobile](./docs/screenshots/mobile.png)
 
+---
 
-## 📌 Sobre o projeto
+## 📌 About the project
 
-O OSTech gerencia:
+OSTech manages:
 
-- Categorias
-- Clientes
-- Técnicos
-- Equipamentos
-- Ordens de Serviço
+- Categories
+- Customers
+- Technicians
+- Equipment
+- Work Orders
 
-A aplicação cobre operações completas de **CRUD**, relacionamentos entre entidades, validação de formulários, tratamento de erros de API, feedback visual e navegação entre páginas.
+The application covers complete **CRUD** operations, relationships between entities, form validation, API error handling, visual feedback, and navigation between pages.
 
 ---
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
 ### Dashboard
-- Totais por entidade: clientes, técnicos, equipamentos, categorias, ordens de serviço
-- Ordens de serviço por status
+- Totals per entity: customers, technicians, equipment, categories, work orders
+- Work orders by status
 
-### Categorias / Clientes / Equipamentos / Técnicos
-- Listagem com TanStack Query
-- Criação com `useMutation`
-- Edição com `useMutation`
-- Exclusão com `useMutation`
-- Invalidação automática das queries após alterações
-- Validação dos dados
-- Feedback visual das operações
+### Categories / Customers / Equipment / Technicians
+- Listing with TanStack Query
+- Creation with `useMutation`
+- Editing with `useMutation`
+- Deletion with `useMutation`
+- Automatic query invalidation after changes
+- Data validation
+- Visual feedback on operations
 
-### Técnicos
-- Controle de disponibilidade (boolean)
+### Technicians
+- Availability control (boolean)
 
-### Ordens de Serviço
-- Listagem, criação, edição, exclusão via TanStack Query
-- Relacionamento com cliente, técnico, categoria e equipamento
-- Validação dos dados antes do envio
-- Tratamento de erros retornados pela API
+### Work Orders
+- Listing, creation, editing, deletion via TanStack Query
+- Relationship with customer, technician, category, and equipment
+- Data validation before submission
+- Handling of errors returned by the API
 
-### Navegação
-- React Router com rotas para todas as entidades
-- Página inicial (Home) com acesso às entidades
-- Página 404 para rotas inexistentes
-- Botão de retorno à Home nas páginas internas
+### Navigation
+- React Router with routes for all entities
+- Home page with access to all entities
+- 404 page for non-existent routes
+- Return-to-home button on internal pages
 
 ---
 
-## 🛠️ Tecnologias
+## 🛠️ Tech stack
 
 ### Frontend
 - React
@@ -81,13 +82,13 @@ A aplicação cobre operações completas de **CRUD**, relacionamentos entre ent
 ### Backend
 - ASP.NET Core (Web API)
 
-> O backend é um projeto separado, consumido pelo frontend via HTTP.
+> The backend is a separate project, consumed by the frontend via HTTP.
 
 ---
 
-## 🧱 Arquitetura
+## 🧱 Architecture
 
-As chamadas à API são organizadas por entidade em services independentes:
+API calls are organized per entity in independent services:
 
 - `categoryService`
 - `customerService`
@@ -95,11 +96,11 @@ As chamadas à API são organizadas por entidade em services independentes:
 - `technicianService`
 - `workOrderService`
 
-Os componentes e páginas utilizam esses services em conjunto com o TanStack Query, mantendo a comunicação com a API separada da camada de interface.
+Components and pages use these services together with TanStack Query, keeping API communication separate from the UI layer.
 
 ---
 
-## 📂 Estrutura do projeto
+## 📂 Project structure
 
 ```text
 src/
@@ -152,43 +153,43 @@ src/
 
 ---
 
-## 🧩 Componentização
+## 🧩 Componentization
 
-Componentes reutilizáveis usados nas páginas de entidade:
+Reusable components used across entity pages:
 
 - `Container`, `Header`, `Loading`, `EmptyState`, `ErrorState`
-- `Modal` (genérico, com scroll interno para formulários grandes)
+- `Modal` (generic, with internal scroll for large forms)
 - `CreateButton`, `ActionsButtons`
 
-Os modais de cada entidade são separados por responsabilidade (`Create*`, `Edit*`, `Delete*`), mantendo os componentes de página mais enxutos.
+Modals for each entity are split by responsibility (`Create*`, `Edit*`, `Delete*`), keeping page components leaner.
 
 ---
 
-## 🔄 Gerenciamento de dados
+## 🔄 Data management
 
-TanStack Query é utilizado para:
+TanStack Query is used to:
 
-- Buscar dados com `useQuery`
-- Criar registros com `useMutation`
-- Atualizar registros com `useMutation`
-- Excluir registros com `useMutation`
-- Invalidar queries após alterações
-- Cache das consultas
-- Refetch automático após invalidação
-- Controlar estados de loading e erro das requisições diretamente pelas queries/mutations
-
----
-
-## 🔄 Hooks personalizados
-
-- **`useModals`** — centraliza o estado de abertura/fechamento dos modais de criar, editar e excluir (`isCreateOpen`, `isEditOpen`, `isDeleteOpen` + funções `open*`/`close*`).
-- **`useRequestState`** — centraliza os estados de validação que permanecem necessários nas páginas (`errors`/`setErrors`), já que loading, submitting e erro de requisição passaram a ser controlados pelo TanStack Query.
+- Fetch data with `useQuery`
+- Create records with `useMutation`
+- Update records with `useMutation`
+- Delete records with `useMutation`
+- Invalidate queries after changes
+- Cache queries
+- Automatic refetch after invalidation
+- Control loading and error states directly through queries/mutations
 
 ---
 
-## 🔗 Relacionamentos
+## 🔄 Custom hooks
 
-Ordem de Serviço se relaciona com Cliente, Técnico, Categoria e Equipamento. Na criação/edição, o usuário seleciona as entidades via `<select>`, e os IDs correspondentes são enviados no payload:
+- **`useModals`** — centralizes the open/close state of create, edit, and delete modals (`isCreateOpen`, `isEditOpen`, `isDeleteOpen` + `open*`/`close*` functions).
+- **`useRequestState`** — centralizes the validation state still needed on the pages (`errors`/`setErrors`), since loading, submitting, and request errors are now handled by TanStack Query.
+
+---
+
+## 🔗 Relationships
+
+A Work Order relates to a Customer, Technician, Category, and Equipment. On creation/editing, the user selects related entities via `<select>`, and the corresponding IDs are sent in the payload:
 
 ```json
 {
@@ -201,9 +202,9 @@ Ordem de Serviço se relaciona com Cliente, Técnico, Categoria e Equipamento. N
 
 ---
 
-## ✅ Validação
+## ✅ Validation
 
-Cada entidade tem uma função de validação própria (`validations/`), executada antes do envio à API. Erros são armazenados em estado e exibidos junto ao campo correspondente:
+Each entity has its own validation function (`validations/`), run before the request is sent to the API. Errors are stored in state and shown next to the corresponding field:
 
 ```javascript
 const validationErrors = validateWorkOrder(workOrder);
@@ -216,15 +217,15 @@ if (Object.keys(validationErrors).length > 0) {
 
 ---
 
-## ⚠️ Tratamento de erros
+## ⚠️ Error handling
 
-Erros de API são interpretados por um utilitário central:
+API errors are interpreted by a central utility:
 
 ```javascript
 getApiErrorMessage(error)
 ```
 
-E exibidos via toast:
+And displayed via toast:
 
 ```javascript
 toast.error(getApiErrorMessage(error));
@@ -232,52 +233,59 @@ toast.error(getApiErrorMessage(error));
 
 ---
 
-## 🔔 Feedback visual
+## 🔔 Visual feedback
 
-React Toastify é usado para confirmar criação, edição, exclusão e reportar erros de operações.
+React Toastify is used to confirm creation, editing, deletion, and to report operation errors.
 
 ---
 
-## 📱 Responsividade
+## 📱 Responsiveness
 
-A interface foi revisada para diferentes tamanhos de tela, com atenção especial a dispositivos a partir de **360px**.
+The interface was reviewed for different screen sizes, with particular attention to devices starting at **360px**.
 
-Foram revisados:
+Reviewed areas:
 
-- Header e navegação
+- Header and navigation
 - Dashboard
-- Listagens
-- Formulários
-- Modais
-- Cards e botões de ação
-- Espaçamentos e hierarquia visual
+- Listings
+- Forms
+- Modals
+- Cards and action buttons
+- Spacing and visual hierarchy
 
 ---
 
-### Passos
+## ⚙️ How to run
+
+### Prerequisites
+
+- Node.js and npm
+- OSTech API backend running
+
+### Steps
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
-cd OSTech.React
+git clone https://github.com/Hernandessn/ostech-workorder-system.git
+cd ostechreact
 npm install
 npm start
 ```
 
-Configure a URL da API em `src/services/api.js` de acordo com o ambiente local.
+Configure the API URL in `src/services/api.js` according to your local environment.
 
 ---
 
-## 📚 Objetivos do projeto
+## 📚 Project goals
 
-- Praticar React em um projeto de porte real
-- Consumir uma API REST própria
-- Trabalhar com CRUD, relacionamentos entre entidades e validação de formulários
-- Migrar o gerenciamento de estado assíncrono para TanStack Query
-- Criar hooks personalizados para reduzir duplicação entre páginas
-- Construir uma interface responsiva com Tailwind CSS
+- Practice React on a project of real-world scale
+- Consume a custom REST API
+- Work with CRUD, entity relationships, and form validation
+- Migrate async state management to TanStack Query
+- Build custom hooks to reduce duplication across pages
+- Build a responsive interface with Tailwind CSS
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Projeto desenvolvido para fins educacionais e de portfólio.
+Project developed for educational and portfolio purposes.
