@@ -1,25 +1,43 @@
 import { useEffect, useState } from 'react';
-import api from '../../services/api';
 
 import { toast } from 'react-toastify';
-import { Container } from '../../components/Container';
-import { ErrorState } from '../../components/ErrorState';
-import { Loading } from '../../components/Loading';
-import { EmptyState } from '../../components/EmptyState';
-import { CreateButton } from '../../components/Buttons/CreateButton';
-import { Header } from '../../components/Header';
-import { TechnicianList, CreateTechnician, DeleteTechnician, EditTechnician } from '../../components/TechnicianItens';
+
+import {
+    Container,
+    Header,
+    Loading,
+    ErrorState,
+    EmptyState
+} from '../../components';
+
+import {
+    TechnicianList,
+    CreateTechnician,
+    DeleteTechnician,
+    EditTechnician
+} from '../../components/TechnicianItens';
+
 import { validateTechnician } from '../../validations/technicianValidation';
 import { getApiErrorMessage } from '../../utils/apiError.js';
-import { useRequestState } from '../../hooks/useRequestState.js';
-import { useModals } from '../../hooks/useModals.js';
+
+import {
+    useModals,
+    useRequestState
+} from '../../hooks';
+
 import { technicianService } from '../../services/technicianService.js';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient
+} from '@tanstack/react-query';
+
+import { CreateButton } from '../../components/Buttons/CreateButton';
 
 
 export const Technician = () => {
     const {
-        setIsSubmitting,
         errors,
         setErrors
     } = useRequestState();
@@ -55,39 +73,39 @@ export const Technician = () => {
         });
     };
 
-    
-        const handleCreateTechnician = () => {
-            const validationErrors = validateTechnician(technicianSelected);
-    
-            if (Object.keys(validationErrors).length > 0) {
-                setErrors(validationErrors);
-                return;
-            }
-    
-            setErrors({});
-    
-            createTechnicianMutation.mutate({
-                name: technicianSelected.name,
-                specialty: technicianSelected.specialty,
-                contact: technicianSelected.contact,
-                availability: technicianSelected.availability,
-                hiringDate: technicianSelected.hiringDate
-            });
-        };
-    
-        const handleUpdateTechnician = () => {
-            updateTechnicianMutation.mutate({
-                id: technicianSelected.technicianId,
-                data: technicianSelected
-            });
-        };
-    
-        const handleDeleteTechnician = () => {
-            deleteTechnicianMutation.mutate(
-                technicianSelected.technicianId
-            );
-        };
-    
+
+    const handleCreateTechnician = () => {
+        const validationErrors = validateTechnician(technicianSelected);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setErrors({});
+
+        createTechnicianMutation.mutate({
+            name: technicianSelected.name,
+            specialty: technicianSelected.specialty,
+            contact: technicianSelected.contact,
+            availability: technicianSelected.availability,
+            hiringDate: technicianSelected.hiringDate
+        });
+    };
+
+    const handleUpdateTechnician = () => {
+        updateTechnicianMutation.mutate({
+            id: technicianSelected.technicianId,
+            data: technicianSelected
+        });
+    };
+
+    const handleDeleteTechnician = () => {
+        deleteTechnicianMutation.mutate(
+            technicianSelected.technicianId
+        );
+    };
+
 
     const clearTechnicianSelected = () => {
         setTechnicianSelected({

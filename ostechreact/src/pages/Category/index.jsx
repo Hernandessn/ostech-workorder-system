@@ -1,24 +1,40 @@
 import React, { useState, useEffect, } from 'react';
-import { Loading } from '../../components/Loading';
-import { ErrorState } from '../../components/ErrorState';
-import { EmptyState } from '../../components/EmptyState';
 
-import { CreateCategory, CategoryList, EditCategory, DeleteCategory } from '../../components/CategoryItens';
-import { CreateButton } from '../../components/Buttons/CreateButton';
-import { Container } from '../../components/Container';
-import { Header } from '../../components/Header';
+import {
+    CreateCategory,
+    CategoryList,
+    EditCategory,
+    DeleteCategory
+} from '../../components/CategoryItens';
+
+import {
+    Container,
+    Header,
+    Loading,
+    ErrorState,
+    EmptyState
+} from '../../components';
 
 import { toast } from 'react-toastify';
 import { validateCategory } from '../../validations/categoryValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
-import { useRequestState } from '../../hooks/useRequestState';
-import { useModals } from '../../hooks/useModals';
+import { CreateButton } from '../../components/Buttons/CreateButton';
+
+import {
+    useModals,
+    useRequestState
+} from '../../hooks';
+
 import { categoryService } from '../../services/categoryService';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient
+} from '@tanstack/react-query';
 
 export const Category = () => {
     const {
-        setIsSubmitting,
         errors,
         setErrors
     } = useRequestState();
@@ -49,7 +65,6 @@ export const Category = () => {
             ...categorySelected,
             [name]: value
         });
-        console.log(categorySelected);
     };
 
     const handleCreateCategory = () => {

@@ -1,25 +1,37 @@
 import { useEffect, useState } from 'react';
 
-import { Container } from '../../components/Container';
-import { CreateButton } from '../../components/Buttons/CreateButton';
-
-import { ErrorState } from '../../components/ErrorState';
-import { EmptyState } from '../../components/EmptyState';
-import { Loading } from '../../components/Loading';
-import { CustomerList, CreateCustomer, EditCustomer, DeleteCustomer } from '../../components/CustomerItens';
-import { Header } from '../../components/Header';
+import {
+    CustomerList,
+    CreateCustomer,
+    EditCustomer,
+    DeleteCustomer
+} from '../../components/CustomerItens';
+import {
+    Container,
+    Header,
+    Loading,
+    ErrorState,
+    EmptyState
+} from '../../components';
 
 import { toast } from 'react-toastify';
 import { validateCustomer } from '../../validations/customerValidation';
 import { getApiErrorMessage } from '../../utils/apiError';
-import { useRequestState } from '../../hooks/useRequestState';
-import { useModals } from '../../hooks/useModals';
+
+import { useModals, useRequestState } from '../../hooks';
+
+import { CreateButton } from '../../components/Buttons/CreateButton';
+
 import { customerService } from '../../services/customerService';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient
+} from '@tanstack/react-query';
 
 export const Customer = () => {
     const {
-        setIsSubmitting,
         errors,
         setErrors
     } = useRequestState();
@@ -52,10 +64,9 @@ export const Customer = () => {
             ...customerSelected,
             [name]: value
         });
-        console.log(customerSelected);
     };
 
- const handleCreateCustomer = () => {
+    const handleCreateCustomer = () => {
         const validationErrors = validateCustomer(customerSelected);
 
         if (Object.keys(validationErrors).length > 0) {
@@ -96,7 +107,7 @@ export const Customer = () => {
         });
     };
 
-   
+
     const {
         data: customer = [],
         isLoading,

@@ -1,24 +1,46 @@
 import { useEffect, useState } from 'react';
+
 import api from '../../services/api';
-import logoOstech from '../../assets/logo-ostech.png';
-import { Container } from '../../components/Container';
+
 import { toast } from 'react-toastify';
-import { ErrorState } from '../../components/ErrorState';
-import { Loading } from '../../components/Loading';
-import { CreateButton } from '../../components/Buttons/CreateButton';
-import { Header } from '../../components/Header';
-import { WorkOrderList, CreateWorkOrder, EditWorkOrder, DeleteWorkOrder } from '../../components/WorkOrderItens';
-import { EmptyState } from '../../components/EmptyState';
+
+import {
+    Container,
+    Header,
+    Loading,
+    ErrorState,
+    EmptyState
+} from '../../components';
+
+import {
+    WorkOrderList,
+    CreateWorkOrder,
+    EditWorkOrder,
+    DeleteWorkOrder
+} from '../../components/WorkOrderItens';
+
+import {
+    useModals,
+    useRequestState
+} from '../../hooks';
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient
+} from '@tanstack/react-query';
+
 import { validateWorkOrder } from '../../validations/workOrderValidation';
-import { useRequestState } from '../../hooks/useRequestState';
-import { useModals } from '../../hooks/useModals';
+
 import { getApiErrorMessage } from '../../utils/apiError';
 import { workOrderService } from '../../services/workOrderService';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+
+
+import { CreateButton } from '../../components/Buttons/CreateButton';
 
 export const WorkOrder = () => {
     const {
-        setIsSubmitting,
         errors,
         setErrors
     } = useRequestState();
@@ -77,7 +99,6 @@ export const WorkOrder = () => {
             ...workOrderSelected,
             [name]: value
         });
-        console.log(workOrderSelected);
     }
 
     const handleCreateWorkOrder = () => {

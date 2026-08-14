@@ -1,24 +1,41 @@
-import api from '../../services/api';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import { Container } from '../../components/Container';
-import { ErrorState } from '../../components/ErrorState';
-import { Loading } from '../../components/Loading';
-import { EmptyState } from '../../components/EmptyState';
-import { CreateButton } from '../../components/Buttons/CreateButton';
-import { Header } from '../../components/Header';
 
-import { EquipmentList, CreateEquipment, EditEquipment, DeleteEquipment } from '../../components/EquipmentItens';
+import { toast } from 'react-toastify';
+
+import {
+    Container,
+    Header,
+    Loading,
+    ErrorState,
+    EmptyState
+} from '../../components';
+
+import {
+    EquipmentList,
+    CreateEquipment,
+    EditEquipment,
+    DeleteEquipment
+} from '../../components/EquipmentItens';
+
 import { validateEquipment } from '../../validations/equipmentValidation';
 import { getApiErrorMessage } from '../../utils/apiError.js';
-import { useRequestState } from '../../hooks/useRequestState.js';
-import { useModals } from '../../hooks/useModals.js';
+
+import {
+    useModals,
+    useRequestState
+} from '../../hooks';
+
 import { equipmentService } from '../../services/equipmentService.js';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CreateButton } from '../../components/Buttons/CreateButton';
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient
+} from '@tanstack/react-query';
 
 export const Equipment = () => {
     const {
-        setIsSubmitting,
         errors,
         setErrors
     } = useRequestState();
@@ -51,7 +68,6 @@ export const Equipment = () => {
             ...equipmentSelected,
             [name]: value
         });
-        console.log(equipmentSelected);
     };
 
     const clearEquipmentSelected = () => {
