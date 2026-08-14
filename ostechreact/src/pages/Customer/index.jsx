@@ -190,7 +190,7 @@ export const Customer = () => {
             ) : (
                 <section className="max-w-3xl mx-auto flex flex-col gap-6 px-4 py-6">
                     <Header />
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <h1 className="text-xl font-semibold text-[#E2E2B6]">Customer List</h1>
                         <CreateButton
                             entity="Customer"

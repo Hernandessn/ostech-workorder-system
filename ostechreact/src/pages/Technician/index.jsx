@@ -204,7 +204,7 @@ export const Technician = () => {
                             }}
                         />
                     </div>
-                    <ul>
+                    <ul className="flex flex-col gap-4">
                         {technician.map(value => (
                             <TechnicianList
                                 key={value.technicianId}
