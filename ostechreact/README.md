@@ -255,12 +255,6 @@ Foram revisados:
 
 ---
 
-## ⚙️ Como executar
-
-### Pré-requisitos
-- Node.js e npm
-- Backend da API OSTech rodando
-
 ### Passos
 
 ```bash
