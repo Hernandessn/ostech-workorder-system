@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Category } from "./pages/Category";
-import { App } from "./App";
+import { Home } from "./pages/Home";
 import { Customer } from "./pages/Customer";
 import { Equipment } from "./pages/Equipment";
 import { WorkOrder } from "./pages/WorkOrder";
@@ -12,7 +12,7 @@ export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" exact Component={App} />
+                <Route path="/" exact Component={Home} />
                 <Route path="/categories" exact Component={Category} />
                 <Route path="/customers" Component={Customer} />
                 <Route path="/equipments" Component={Equipment} />
