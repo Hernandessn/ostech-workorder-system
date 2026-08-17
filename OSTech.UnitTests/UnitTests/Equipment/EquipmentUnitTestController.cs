@@ -17,7 +17,7 @@ namespace OSTech.Tests.UnitTests.Equipment
         public IMapper mapper;
         private static DbContextOptions<AppDbContext> dbContextOptions;
 
-        public static string connectionString = "Server=localhost;Database=OSTechDatabase;User=root;Password=SENHA_REMOVIDA;";
+        public static string connectionString = TestConfiguration.ConnectionString;
 
         static EquipmentUnitTestController()
         {
