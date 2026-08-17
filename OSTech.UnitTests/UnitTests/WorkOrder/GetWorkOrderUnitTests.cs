@@ -62,14 +62,17 @@ namespace OSTech.Tests.UnitTests.WorkOder
                        .BeAssignableTo<IEnumerable<WorkOrderDTO>>();
         }
         [Fact]
-        public async Task GetWorkOrderById_Returns_BadRequestResult()
+        public async Task GetWorkOrderById_Returns_NotFoundResult()
         {
+            //Arrange
+            var id = 0;
+
             //Act 
-            var data = await _controller.Get();
+            var data = await _controller.Get(id);
 
             //Assert
-            data.Result.Should().BeOfType<BadRequestResult>()
-                       .Which.StatusCode.Should().Be(400);
+            data.Result.Should().BeOfType<NotFoundObjectResult>()
+                       .Which.StatusCode.Should().Be(404);
         }
     }
 }
