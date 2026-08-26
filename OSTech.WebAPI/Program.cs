@@ -187,8 +187,6 @@ if (app.Environment.IsDevelopment())
     app.ConfigureExceptionHandler();
 }
 
-app.UseHttpsRedirection();
-
 app.UseAuthentication();
 
 app.UseRateLimiter();
