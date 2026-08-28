@@ -25,12 +25,14 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions
           .ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowedOrigins",
     policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
