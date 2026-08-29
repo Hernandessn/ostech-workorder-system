@@ -13,13 +13,16 @@ COPY . .
 
 RUN dotnet publish OSTech.WebAPI/OSTech.WebAPI.csproj -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 
 WORKDIR /app
 
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV ASPNETCORE_HTTP_PORTS=8080
 
 EXPOSE 8080
+
+RUN apk add --no-cache icu-libs
 
 COPY --from=build /app/publish .
 
