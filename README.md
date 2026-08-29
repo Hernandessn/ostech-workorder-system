@@ -731,7 +731,6 @@ Instead of creating isolated projects for every technology, OSTech uses the same
 This makes it possible to observe how the architecture changes as new requirements and technologies are introduced.
 
 ---
-
 # ▶️ Getting Started
 
 ## Backend
@@ -739,7 +738,7 @@ This makes it possible to observe how the architecture changes as new requiremen
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/OSTech.git
+git clone https://github.com/Hernandessn/ostech-workorder-system.git
 ```
 
 Restore the .NET dependencies:
@@ -753,7 +752,7 @@ Update the database:
 ```bash
 dotnet ef database update \
     --project OSTech.EFCore \
-    --startup-project OSTech.Console
+    --startup-project OSTech.WebAPI
 ```
 
 Run the API:
@@ -769,7 +768,7 @@ dotnet run --project OSTech.WebAPI
 Navigate to the React project:
 
 ```bash
-cd OSTech.React
+cd ostechreact
 ```
 
 Install dependencies:
@@ -785,6 +784,61 @@ npm start
 ```
 
 Make sure the ASP.NET Core API is running before starting the frontend.
+
+---
+
+# 🐳 Running with Docker
+
+The project can also be run entirely with Docker Compose, spinning up the React frontend, the ASP.NET Core Web API, and MySQL together.
+
+## Prerequisites
+
+- Docker Desktop installed and running
+
+## Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Hernandessn/ostech-workorder-system.git
+cd OSTech
+```
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+MYSQL_ROOT_PASSWORD=your_password_here
+MYSQL_DATABASE=OSTechDatabase
+REACT_APP_API_URL=http://localhost:8000/api/v1
+```
+
+Start the containers:
+
+```bash
+docker-compose up --build
+```
+
+This will build and start three services:
+
+- **mysql** — MySQL 8.0 database (exposed on port 3306)
+- **api** — ASP.NET Core Web API (exposed on port 8000)
+- **frontend** — React app served via Nginx (exposed on port 3000)
+
+## Applying migrations
+
+The database starts empty on first run. Migrations need to be applied manually, once, after the containers are up:
+
+```bash
+dotnet tool install --global dotnet-ef
+dotnet ef database update --project OSTech.EFCore --startup-project OSTech.WebAPI
+```
+
+This step assumes your local `OSTech.WebAPI` User Secrets point to `Server=localhost;Database=OSTechDatabase;User=root;Password=<same as MYSQL_ROOT_PASSWORD>` — the same port MySQL exposes to the host.
+
+## Accessing the application
+
+- Frontend: http://localhost:3000
+- API (Swagger): http://localhost:8000/swagger
 
 ---
 
