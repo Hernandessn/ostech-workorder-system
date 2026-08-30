@@ -842,6 +842,14 @@ This step assumes your local `OSTech.WebAPI` User Secrets point to `Server=local
 
 ---
 
+## Simulating production
+
+By default, `docker-compose up` runs the API in `Development` mode (Swagger enabled). To test a configuration closer to production, use the `docker-compose.prod.yml` override, which switches the API to `Production` mode (Swagger disabled):
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+```
+
 # 📖 What I've Learned
 
 Throughout the development of OSTech, I have practiced:
