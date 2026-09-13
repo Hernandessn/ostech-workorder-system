@@ -1,8 +1,5 @@
 ﻿using OSTech.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
+using OSTech.Domain.ValueObjects;
 
 namespace OSTech.Domain.Entities
 {
@@ -10,9 +7,9 @@ namespace OSTech.Domain.Entities
     {
         public int CustomerId { get; private set; }
         public string Name { get; private set; }
-        public string Email { get; private set; }
+        public EmailAddress Email { get; private set; }
         public string Phone { get; private set; }
-        public string Document {  get; private set; }
+        public Document Document {  get; private set; }
 
         public ICollection<WorkOrder> WorkOrders { get; private set; } = new List<WorkOrder>();
 
@@ -23,9 +20,9 @@ namespace OSTech.Domain.Entities
         public Customer
         (
            string name,
-           string email,
+           EmailAddress email,
            string phone,
-           string document
+           Document document
         )
         {
             SetName(name);
@@ -40,11 +37,10 @@ namespace OSTech.Domain.Entities
 
             Name = name;
         }
-        public void SetEmail(string email)
+        public void SetEmail(EmailAddress email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new DomainException("O email é obrigatório.");
-
+            if (email == null)
+                throw new DomainException("Email inválido.");
             Email = email;
         }
         public void SetPhone(string phone)
@@ -54,9 +50,9 @@ namespace OSTech.Domain.Entities
 
             Phone = phone;
         }
-        public void SetDocument(string document)
+        public void SetDocument(Document document)
         {
-            if (string.IsNullOrWhiteSpace(document))
+            if (document == null)
                 throw new DomainException("O documento é obrigatório.");
 
             Document = document;

@@ -33,7 +33,7 @@ namespace OSTech.Domain.Entities
             decimal amount,
             DateOnly deadline,
             DateOnly openingDate,
-            int technicianId,
+            Technician technician,
             int customerId,
             int categoryId,
             int equipmentId)
@@ -47,18 +47,24 @@ namespace OSTech.Domain.Entities
 
             ChangeDeadline(deadline);
 
-            AssignTechnician(technicianId);
+            AssignTechnician(technician);
             AssignCustomer(customerId);
             AssignCategory(categoryId);
             AssignEquipment(equipmentId);
         }
-        public void AssignTechnician(int technicianId)
+        public void AssignTechnician(Technician technician)
         {
-            if (technicianId <= 0)
-            {
+            if(technician == null)
                 throw new DomainException("Técnico inválido.");
-            }
+
+            int technicianId = technician.TechnicianId;
+            bool technicianAvailability = technician.Availability;
+
+            if (technicianId <= 0 || !technicianAvailability)
+                throw new DomainException("Técnico inválido.");
+
             TechnicianId = technicianId;
+            Technician = technician;
         }
         public void AssignCustomer(int customerId)
         {
@@ -90,6 +96,10 @@ namespace OSTech.Domain.Entities
             {
                 throw new DomainException("A data de término não pode ser menor que a data de abertura.");
             }
+            if (Status != StatusWorkOrder.Open)
+            {
+                throw new InvalidWorkOrderStatusException("Só é possível mudar o prazo de uma ordem serviço aberta!");
+            }
             Deadline = deadline;
         }
         public void SetDescription(string description)
@@ -119,7 +129,7 @@ namespace OSTech.Domain.Entities
         public void Start()
         {
             if (Status != StatusWorkOrder.Open)
-                throw new DomainException(
+                throw new InvalidWorkOrderStatusException(
                     "Somente ordens abertas podem ser iniciadas.");
 
             Status = StatusWorkOrder.InProgress;
@@ -127,7 +137,7 @@ namespace OSTech.Domain.Entities
         public void Complete()
         {
             if (Status != StatusWorkOrder.InProgress)
-                throw new DomainException(
+                throw new InvalidWorkOrderStatusException(
                     "Somente ordens em andamento podem ser concluídas.");
 
             Status = StatusWorkOrder.Completed;
@@ -136,11 +146,11 @@ namespace OSTech.Domain.Entities
         public void Cancel()
         {
             if (Status == StatusWorkOrder.Completed)
-                throw new DomainException(
+                throw new InvalidWorkOrderStatusException(
                     "Uma ordem concluída não pode ser cancelada.");
 
             if (Status == StatusWorkOrder.Canceled)
-                throw new DomainException(
+                throw new InvalidWorkOrderStatusException(
                     "A ordem já está cancelada.");
 
             Status = StatusWorkOrder.Canceled;

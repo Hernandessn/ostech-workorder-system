@@ -6,5 +6,6 @@ namespace OSTech.WebAPI.Repositories
     public interface IWorkOrderRepository : IRepository<WorkOrder>
     {
         Task<WorkOrder?> Update(WorkOrder workOrder);
+        Task<IEnumerable<WorkOrder>>GetByCategoryId(int categoryId);
     }
 }
