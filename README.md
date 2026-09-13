@@ -683,22 +683,52 @@ Topics studied:
 
 ---
 
+## ✅ Stage 6 — Domain-Driven Design
+
+Completed.
+
+Topics studied:
+
+- Ubiquitous Language
+- Entities vs. Anemic Models
+- Value Objects
+- Invariants and Guard Clauses
+- Aggregates and Aggregate Roots
+- Domain Services
+- Domain Events (evaluated, deliberately not applied)
+- Bounded Contexts
+- Application Services
+- Isolated domain unit testing
+
+
+---
+
+# 🧭 Domain-Driven Design
+
+After completing the initial architectural stages, the domain layer was revisited and evolved using Domain-Driven Design principles, applied selectively based on real needs identified in the domain — not as a checklist of patterns.
+
+Key outcomes:
+
+- **Entities** (`WorkOrder`, `Technician`, `Customer`, `Category`, `Equipment`) enforce their own invariants through guarded constructors and behavior methods, rejecting invalid state instead of relying on external validation.
+- **Value Objects** (`EmailAddress`, `Document`) encapsulate format validation, normalization, and value-based equality, replacing primitive `string` fields where real business rules existed.
+- **Aggregates**: each entity was evaluated against its own lifecycle and consistency boundary. The domain currently consists of five independent Aggregates, with no forced grouping.
+- **Domain Service** (`CategoryDomainService`) isolates a rule that spans multiple Aggregates (blocking Category deletion when open Work Orders reference it), keeping it out of any single Entity.
+- **Domain-specific exceptions** (`InvalidWorkOrderStatusException`, `CategoryDeletionBlockedException`) differentiate state-violation errors from generic domain validation errors.
+- **Application Service** (`WorkOrderApplicationService`) extracts use-case orchestration (fetching dependencies, creating the entity, persisting) out of the Controller, which now only translates HTTP and delegates to the domain.
+
+Deliberate decisions **not** to apply certain patterns were also part of the process — for example, Domain Events and multiple Bounded Contexts were evaluated and postponed, since no real need for them exists in the current domain.
+
+A full sprint-by-sprint report of this process is available on request / in project notes.
+
+--- 
+
 # 🚧 Next Steps
 
 The OSTech will continue evolving as new software engineering concepts are studied.
 
 Planned topics include:
 
-- Clean Architecture
-- Automated Testing / TDD
-- Docker
-- Domain-Driven Design
 - CQRS
-- MediatR
-- RabbitMQ
-- Oracle Database
-- Microservices
-- Authentication and Authorization
 
 These technologies will be introduced gradually rather than being treated as completed features.
 
@@ -731,6 +761,9 @@ Instead of creating isolated projects for every technology, OSTech uses the same
 This makes it possible to observe how the architecture changes as new requirements and technologies are introduced.
 
 ---
+
+
+
 # ▶️ Getting Started
 
 ## Backend
@@ -902,6 +935,8 @@ Throughout the development of OSTech, I have practiced:
 **ASP.NET Core MVC:** ✅ Completed
 
 **React Frontend:** ✅ Completed
+
+**Domain-Driven Design:** ✅ Completed
 
 **Current focus:** 🚧 Continuing the software engineering roadmap
 
