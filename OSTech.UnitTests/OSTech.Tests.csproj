@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OSTech.Domain\OSTech.Domain.csproj" />
     <ProjectReference Include="..\OSTech.EFCore\OSTech.Infrastructure.csproj" />
     <ProjectReference Include="..\OSTech.WebAPI\OSTech.WebAPI.csproj" />
   </ItemGroup>

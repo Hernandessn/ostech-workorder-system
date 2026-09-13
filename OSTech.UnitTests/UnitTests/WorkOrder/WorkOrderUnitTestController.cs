@@ -3,11 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using OSTech.Application.Mappings;
 using OSTech.EFCore.Context;
 using OSTech.Infrastructure.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OSTech.Tests.UnitTests.WorkOder
 {

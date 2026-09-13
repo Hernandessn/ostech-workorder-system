@@ -21,18 +21,15 @@ namespace OSTech.Tests.UnitTests.Customer
         }
 
         [Fact]
-        public async Task DeleteCustomerById_Return_NoContent()
+        public async Task DeleteCategoryById_Return_NoContent()
         {
-            var id = 2;
+            var id = 4; // Categoria sem WorkOrders Open/InProgress
 
-            // Act
             var result = await _controller.Delete(id);
 
-            // Assert
             result.Should().BeOfType<NoContentResult>()
                   .Which.StatusCode.Should().Be(204);
         }
-
         [Fact]
         public async Task DeleteCustomerById_Return_NotFound()
         {

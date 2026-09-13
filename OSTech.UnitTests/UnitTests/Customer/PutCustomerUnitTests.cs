@@ -30,10 +30,9 @@ namespace OSTech.Tests.UnitTests.Customer
             var updatedCustomer = new UpdateCustomerDTO
             {
                 Name = "Novo Cliente Alterado",
-                Document = "Documento do Novo Cliente Alterado",
-                Email = "Email do Novo Cliente Alterado",
-                Phone = "Telefone do Novo Cliente Alterado"
-
+                Document = "123.456.789-09",
+                Email = "clientealterado@email.com",
+                Phone = "11988887777"
             };
 
             // Act

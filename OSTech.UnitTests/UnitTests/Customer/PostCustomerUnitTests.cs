@@ -30,9 +30,9 @@ namespace OSTech.Tests.UnitTests.Customer
             var newCustomerDto = new CreateCustomerDTO
             {
                 Name = "Novo cliente",
-                Document = "12345678901",
-                Email = "email do novo cliente",
-                Phone = "12345678901"
+                Document = "111.444.777-35",
+                Email = "novocliente@email.com",
+                Phone = "11987654321"
             };
 
             // Act

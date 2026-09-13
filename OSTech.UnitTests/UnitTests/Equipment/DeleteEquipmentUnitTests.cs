@@ -1,14 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
-using OSTech.Domain.Entities;
-using OSTech.Tests.UnitTests.Customer;
 using OSTech.WebAPI.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace OSTech.Tests.UnitTests.Equipment
 {

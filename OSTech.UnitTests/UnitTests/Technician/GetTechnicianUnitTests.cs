@@ -25,16 +25,12 @@ namespace OSTech.Tests.UnitTests.Technician
         [Fact]
         public async Task GetTechnicianById_OkResult()
         {
-            //Arrange
-            var id = 2;
+            var id = 4; // não é o mesmo usado em DeleteTechnicianUnitTests
 
-            //Act
             var data = await _controller.Get(id);
 
-            //Assert (xunit)
             var okResult = Assert.IsType<OkObjectResult>(data.Result);
             Assert.Equal(200, okResult.StatusCode);
-
         }
 
         [Fact]

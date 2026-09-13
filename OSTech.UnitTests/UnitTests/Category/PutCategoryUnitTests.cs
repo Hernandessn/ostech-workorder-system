@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
+using OSTech.Domain.Services;
 using OSTech.WebAPI.Controllers;
 using OSTech.WebAPI.Dtos.Category;
 using System;
@@ -14,6 +15,7 @@ namespace OSTech.Tests.UnitTests.Category
 {
     public class PutCategoryUnitTests : IClassFixture<CategoryUnitTestController>
     {
+        private readonly CategoryDomainService _categoryDomainService;
         private readonly CategoryController _controller;
         private readonly IMemoryCache _memoryCache;
 
@@ -21,7 +23,8 @@ namespace OSTech.Tests.UnitTests.Category
         {
             _memoryCache = new MemoryCache(new MemoryCacheOptions());
 
-            _controller = new CategoryController(NullLogger<CategoryController>.Instance, controller.repository, controller.mapper, _memoryCache);
+            _controller = new CategoryController(NullLogger<CategoryController>.Instance, controller.repository,
+                controller.mapper, _memoryCache, _categoryDomainService);
         }
         [Fact]
         public async Task PutCategory_Return_OkResult()
