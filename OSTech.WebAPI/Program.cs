@@ -6,12 +6,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OSTech.Application.Mappings;
+using OSTech.Domain;
 using OSTech.Domain.Entities;
+using OSTech.Domain.Services;
 using OSTech.EFCore.Context;
 using OSTech.Infrastructure.Authentication.JWT;
 using OSTech.Infrastructure.UnitOfWork;
 using OSTech.WebAPI.Extensions;
 using OSTech.WebAPI.Logging;
+using OSTech.WebAPI.Repositories;
+using OSTech.WebAPI.Services;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -22,8 +26,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers()
       .AddJsonOptions(options =>
-        options.JsonSerializerOptions
-          .ReferenceHandler = ReferenceHandler.IgnoreCycles);
+      {
+          options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+      });
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
@@ -168,6 +174,11 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddScoped<IDomainWorkOrderRepository, WorkOrderRepository>();
+builder.Services.AddScoped<CategoryDomainService>();
+
+builder.Services.AddScoped<WorkOrderApplicationService>();
 
 var app = builder.Build();
 

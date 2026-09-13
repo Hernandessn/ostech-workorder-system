@@ -1,14 +1,11 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
-using OSTech.EFCore.Context;
-using OSTech.WebAPI.Dtos.Technician;
-using OSTech.WebAPI.Dtos.WorkOrder;
-using OSTech.WebAPI.Repositories;
-using Microsoft.AspNetCore.Http;
 using OSTech.Infrastructure.UnitOfWork;
+using OSTech.WebAPI.Dtos.WorkOrder;
+using OSTech.WebAPI.Services;
+using System.Net.NetworkInformation;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -74,12 +71,13 @@ namespace OSTech.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult<WorkOrderDTO>> Post(CreateWorkOrderDTO dto)
+        public async Task<ActionResult<WorkOrderDTO>> Post(CreateWorkOrderDTO dto,
+            [FromServices] WorkOrderApplicationService workOrderApplicationService)
         {
             if (dto is null)
                 return BadRequest();
 
-            var workOrder = new WorkOrder(
+            var workOrder = await workOrderApplicationService.CreateWorkOrderAsync(
                 dto.Description,
                 dto.Title,
                 dto.Amount,
@@ -89,10 +87,7 @@ namespace OSTech.WebAPI.Controllers
                 dto.CustomerId,
                 dto.CategoryId,
                 dto.EquipmentId
-            );
-
-            await _uof.WorkOrderRepository.Create(workOrder);
-            await _uof.CommitAsync();
+                );
 
             var workOrderDTO = new WorkOrderDTO
             {
@@ -124,6 +119,7 @@ namespace OSTech.WebAPI.Controllers
                 return BadRequest();
 
             var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
+            var technician = await _uof.TechnicianRepository.GetById(c => c.TechnicianId == dto.TechnicianId);
 
             if (workOrder is null)
             {
@@ -136,7 +132,7 @@ namespace OSTech.WebAPI.Controllers
             workOrder.SetAmount(dto.Amount);
             workOrder.ChangeDeadline(dto.Deadline);
 
-            workOrder.AssignTechnician(dto.TechnicianId);
+            workOrder.AssignTechnician(technician);
             workOrder.AssignCustomer(dto.CustomerId);
             workOrder.AssignCategory(dto.CategoryId);
             workOrder.AssignEquipment(dto.EquipmentId);
@@ -149,6 +145,105 @@ namespace OSTech.WebAPI.Controllers
                 WorkOrderId = workOrder.WorkOrderId,
                 Description = workOrder.Description,
                 Title = workOrder.Title,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                TechnicianId = workOrder.TechnicianId,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
+
+            return Ok(workOrderDto);
+
+        }
+
+        [HttpPatch("{id:int:min(1)}/start")]
+        public async Task<ActionResult> Start(int id)
+        {
+            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
+
+            if (workOrder is null)
+            {
+                _logger.LogWarning($"WorkOrder with id= {id} not found...");
+                return NotFound("WorkOrder not found.");
+            }
+            workOrder.Start();
+
+            await _uof.CommitAsync();
+
+            var workOrderDto = new WorkOrderDTO
+            {
+                WorkOrderId = workOrder.WorkOrderId,
+                Description = workOrder.Description,
+                Title = workOrder.Title,
+                Status = workOrder.Status,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                TechnicianId = workOrder.TechnicianId,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
+
+            return Ok(workOrderDto);
+
+        }
+        [HttpPatch("{id:int:min(1)}/complete")]
+        public async Task<ActionResult> Complete(int id)
+        {
+            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
+
+            if (workOrder is null)
+            {
+                _logger.LogWarning($"WorkOrder with id= {id} not found...");
+                return NotFound("WorkOrder not found.");
+            }
+
+            workOrder.Complete();
+
+            await _uof.CommitAsync();
+
+            var workOrderDto = new WorkOrderDTO
+            {
+                WorkOrderId = workOrder.WorkOrderId,
+                Description = workOrder.Description,
+                Title = workOrder.Title,
+                Status = workOrder.Status,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                TechnicianId = workOrder.TechnicianId,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
+
+            return Ok(workOrderDto);
+        }
+
+        [HttpPatch("{id:int:min(1)}/cancel")]
+        public async Task<ActionResult> Cancel(int id)
+        {
+            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
+
+            if (workOrder is null)
+            {
+                _logger.LogWarning($"WorkOrder with id= {id} not found...");
+                return NotFound("WorkOrder not found.");
+            }
+
+            workOrder.Cancel();
+
+            await _uof.CommitAsync();
+
+            var workOrderDto = new WorkOrderDTO
+            {
+                WorkOrderId = workOrder.WorkOrderId,
+                Description = workOrder.Description,
+                Title = workOrder.Title,
+                Status = workOrder.Status,
                 Amount = workOrder.Amount,
                 Deadline = workOrder.Deadline,
                 OpeningDate = workOrder.OpeningDate,

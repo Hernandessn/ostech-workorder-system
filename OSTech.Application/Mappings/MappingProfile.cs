@@ -16,7 +16,17 @@ namespace OSTech.Application.Mappings
 
             CreateMap<Category, CategoryDTO>();
 
-            CreateMap<Customer, CustomerDTO>();
+            CreateMap<Customer, CustomerDTO>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src =>
+                    src.Email != null
+                        ? src.Email.Address
+                        : null
+                ))
+                .ForMember(dest => dest.Document, opt => opt.MapFrom(src =>
+                    src.Document != null
+                        ? src.Document.Number
+                        : null
+                ));
 
             CreateMap<Equipment, EquipmentDTO>();
 

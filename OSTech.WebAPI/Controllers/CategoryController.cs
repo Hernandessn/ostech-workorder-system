@@ -1,15 +1,17 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using OSTech.Domain.Entities;
+using OSTech.Domain.Exceptions;
+using OSTech.Domain.Services;
+using OSTech.Infrastructure.UnitOfWork;
 using OSTech.WebAPI.Dtos.Category;
 using OSTech.WebAPI.Repositories;
-using Microsoft.AspNetCore.Http;
-using OSTech.Infrastructure.UnitOfWork;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -20,17 +22,20 @@ namespace OSTech.WebAPI.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     public class CategoryController : ControllerBase
     {
+        private readonly CategoryDomainService _categoryDomainService;
         private readonly ILogger<CategoryController> _logger;
         private readonly IUnitOfWork _uof;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private const string CacheCategoriesKey = "CacheCategories";
-        public CategoryController(ILogger<CategoryController> logger, IUnitOfWork uof, IMapper mapper, IMemoryCache cache)
+        public CategoryController(ILogger<CategoryController> logger, IUnitOfWork uof,
+            IMapper mapper, IMemoryCache cache, CategoryDomainService categoryDomainService)
         {
             _logger = logger;
             _uof = uof;
             _mapper = mapper;
             _cache = cache;
+            _categoryDomainService = categoryDomainService;
         }
         /// <summary>
         /// Obtém todas as categorias cadastradas
@@ -176,11 +181,12 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Category not found.");
             }
 
+            await _categoryDomainService.EnsureCategoryCanBeDeletedAsync(id);
+
             await _uof.CategoryRepository.Delete(id);
             await _uof.CommitAsync();
 
             InvalidateCacheAfterChange(id);
-
             _logger.LogInformation("Category deleted. Id={Id}", id);
 
             return NoContent();

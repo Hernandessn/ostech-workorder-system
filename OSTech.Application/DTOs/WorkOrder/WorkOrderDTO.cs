@@ -1,6 +1,4 @@
-﻿using OSTech.Domain.Entities;
-using OSTech.Domain.Entities;
-using OSTech.Domain.Enums;
+﻿using OSTech.Domain.Enums;
 
 namespace OSTech.WebAPI.Dtos.WorkOrder
 {
@@ -12,6 +10,7 @@ namespace OSTech.WebAPI.Dtos.WorkOrder
         public decimal Amount { get; set; }
         public DateOnly Deadline { get; set; }
         public DateOnly OpeningDate { get; set; }
+        public StatusWorkOrder? Status {  get; set; }
 
         public int TechnicianId { get; set; }
         public int CustomerId { get; set; }

@@ -9,6 +9,7 @@ using OSTech.WebAPI.Dtos.WorkOrder;
 using OSTech.WebAPI.Repositories;
 using Microsoft.AspNetCore.Http;
 using OSTech.Infrastructure.UnitOfWork;
+using OSTech.Domain.ValueObjects;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -75,14 +76,17 @@ namespace OSTech.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerDTO>> Post(CreateCustomerDTO dto)
         {
-            if(dto is null)
+            if (dto is null)
                 return BadRequest();
+
+            var email = EmailAddress.Create(dto.Email);
+            var document = Document.Create(dto.Document);
 
             var customer = new Customer(
                 dto.Name,
-                dto.Email,
+                email,
                 dto.Phone,
-                dto.Document
+                document
             );
 
             if (customer is null)
@@ -98,9 +102,9 @@ namespace OSTech.WebAPI.Controllers
             {
                 CustomerId = customer.CustomerId,
                 Name = customer.Name,
-                Email = customer.Email,
+                Email = customer.Email.Address,
                 Phone = customer.Phone,
-                Document = customer.Document
+                Document = customer.Document.Number
             };
 
             return CreatedAtRoute(
@@ -123,10 +127,14 @@ namespace OSTech.WebAPI.Controllers
                 _logger.LogWarning($"Customer with id= {id} not found...");
                 return NotFound("Customer not found.");
             }
+
+            var email = EmailAddress.Create(dto.Email);
+            var document = Document.Create(dto.Document);
+
             customer.SetName(dto.Name);
-            customer.SetEmail(dto.Email);
+            customer.SetEmail(email);
             customer.SetPhone(dto.Phone);
-            customer.SetDocument(dto.Document);
+            customer.SetDocument(document);
 
             await _uof.CustomerRepository.Update(customer);
             await _uof.CommitAsync();
@@ -135,9 +143,9 @@ namespace OSTech.WebAPI.Controllers
             {
                 CustomerId = customer.CustomerId,
                 Name = customer.Name,
-                Email = customer.Email,
+                Email = customer.Email.Address,
                 Phone = customer.Phone,
-                Document = customer.Document
+                Document = customer.Document.Number
             };
 
             return Ok(customerDTO);
