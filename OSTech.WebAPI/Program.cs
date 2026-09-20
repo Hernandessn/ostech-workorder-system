@@ -14,8 +14,8 @@ using OSTech.Infrastructure.Authentication.JWT;
 using OSTech.Infrastructure.UnitOfWork;
 using OSTech.WebAPI.Extensions;
 using OSTech.WebAPI.Logging;
+using OSTech.WebAPI.Middlewares;
 using OSTech.WebAPI.Repositories;
-using OSTech.WebAPI.Services;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -178,11 +178,11 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IDomainWorkOrderRepository, WorkOrderRepository>();
 builder.Services.AddScoped<CategoryDomainService>();
 
-builder.Services.AddScoped<WorkOrderApplicationService>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 var app = builder.Build();
 
-
+app.ConfigureExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -196,8 +196,6 @@ if (app.Environment.IsDevelopment())
             "/swagger/v1/swagger.json",
             "OSTech API v1");
     });
-
-    app.ConfigureExceptionHandler();
 }
 
 app.UseAuthentication();

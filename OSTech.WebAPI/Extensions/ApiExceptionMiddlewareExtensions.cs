@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using OSTech.Domain.Exceptions;
-using System.Net;
 using System.Text.Json;
 
 namespace OSTech.WebAPI.Extensions
@@ -25,14 +24,12 @@ namespace OSTech.WebAPI.Extensions
                         Message = feature.Error.Message
                     };
 
-                    if (feature.Error is DomainException)
+                    context.Response.StatusCode = feature.Error switch
                     {
-                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    }
+                        NotFoundDomainException => StatusCodes.Status404NotFound,
+                        DomainException => StatusCodes.Status400BadRequest,
+                        _ => StatusCodes.Status500InternalServerError
+                    };
 
                     error.StatusCode = context.Response.StatusCode;
 

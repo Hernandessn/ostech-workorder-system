@@ -1,11 +1,12 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using OSTech.Domain.Entities;
+using OSTech.Domain.Exceptions;
 using OSTech.Infrastructure.UnitOfWork;
+using OSTech.WebAPI.Commands.WorkOrders;
 using OSTech.WebAPI.Dtos.WorkOrder;
-using OSTech.WebAPI.Services;
-using System.Net.NetworkInformation;
+using OSTech.WebAPI.Queries.WorkOrders;
 
 namespace OSTech.WebAPI.Controllers
 {
@@ -16,12 +17,14 @@ namespace OSTech.WebAPI.Controllers
     {
         private readonly ILogger<WorkOrderController> _logger;
         private readonly IUnitOfWork _uof;
+        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        public WorkOrderController(ILogger<WorkOrderController> logger, IUnitOfWork uof, IMapper mapper)
+        public WorkOrderController(ILogger<WorkOrderController> logger, IUnitOfWork uof, IMapper mapper, IMediator mediator)
         {
             _logger = logger;
             _uof = uof;
             _mapper = mapper;
+            _mediator = mediator;
         }
         /// <summary>
         /// Obtém uma lista de ordens de serviços cadastrados
@@ -35,10 +38,10 @@ namespace OSTech.WebAPI.Controllers
         {
             try
             {
-                var workOrders = await _uof.WorkOrderRepository.GetAll();
-                var workOrdersDto = _mapper.Map<IEnumerable<WorkOrderDTO>>(workOrders);
+                var query = new GetWorkOrdersQuery(); 
+                var workOrders = await _mediator.Send(query);
 
-                return Ok(workOrdersDto);
+                return Ok(workOrders);
             }
             catch (Exception)
             {
@@ -54,7 +57,8 @@ namespace OSTech.WebAPI.Controllers
         public async Task<ActionResult<WorkOrderDTO>> Get(int id)
         {
 
-            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
+            var query = new GetWorkOrderByIdQuery { WorkOrderId = id };
+            var workOrder = await _mediator.Send(query);
 
             if (workOrder is null)
             {
@@ -62,42 +66,42 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("WorkOrder not found.");
             }
 
-            var dto = _mapper.Map<WorkOrderDTO>(workOrder);
-
-            return Ok(dto);
-
+            return Ok(workOrder);
         }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult<WorkOrderDTO>> Post(CreateWorkOrderDTO dto,
-            [FromServices] WorkOrderApplicationService workOrderApplicationService)
+        public async Task<ActionResult<WorkOrderDTO>> Post(CreateWorkOrderDTO dto)
         {
             if (dto is null)
                 return BadRequest();
 
-            var workOrder = await workOrderApplicationService.CreateWorkOrderAsync(
-                dto.Description,
-                dto.Title,
-                dto.Amount,
-                dto.Deadline,
-                dto.OpeningDate,
-                dto.TechnicianId,
-                dto.CustomerId,
-                dto.CategoryId,
-                dto.EquipmentId
-                );
+            var command = new CreateWorkOrderCommand
+            {
+                TechnicianId = dto.TechnicianId,
+                Title = dto.Title,
+                Description = dto.Description,
+                Amount = dto.Amount,
+                Deadline = dto.Deadline,
+                OpeningDate = dto.OpeningDate,
+                CustomerId = dto.CustomerId,
+                CategoryId = dto.CategoryId,
+                EquipmentId = dto.EquipmentId
+            };
+
+            var workOrder = await _mediator.Send(command);
 
             var workOrderDTO = new WorkOrderDTO
             {
                 WorkOrderId = workOrder.WorkOrderId,
-                TechnicianId = workOrder.TechnicianId,
-                Title = workOrder.Title,
                 Description = workOrder.Description,
+                Title = workOrder.Title,
+                Status = workOrder.Status,
                 Amount = workOrder.Amount,
                 Deadline = workOrder.Deadline,
                 OpeningDate = workOrder.OpeningDate,
+                TechnicianId = workOrder.TechnicianId,
                 CustomerId = workOrder.CustomerId,
                 CategoryId = workOrder.CategoryId,
                 EquipmentId = workOrder.EquipmentId
@@ -107,7 +111,6 @@ namespace OSTech.WebAPI.Controllers
                 "GetWorkOrder",
                 new { id = workOrder.WorkOrderId },
                 workOrderDTO);
-
         }
         [HttpPut("{id:int:min(1)}")]
         public async Task<ActionResult<WorkOrderDTO>> Put(int id, UpdateWorkOrderDTO dto)
@@ -118,59 +121,20 @@ namespace OSTech.WebAPI.Controllers
             if (id <= 0)
                 return BadRequest();
 
-            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
-            var technician = await _uof.TechnicianRepository.GetById(c => c.TechnicianId == dto.TechnicianId);
-
-            if (workOrder is null)
+            var command = new UpdateWorkOrderCommand
             {
-                _logger.LogWarning($"WorkOrder with id= {id} not found...");
-                return NotFound("WorkOrder not found.");
-            }
-
-            workOrder.SetDescription(dto.Description);
-            workOrder.SetTitle(dto.Title);
-            workOrder.SetAmount(dto.Amount);
-            workOrder.ChangeDeadline(dto.Deadline);
-
-            workOrder.AssignTechnician(technician);
-            workOrder.AssignCustomer(dto.CustomerId);
-            workOrder.AssignCategory(dto.CategoryId);
-            workOrder.AssignEquipment(dto.EquipmentId);
-
-            await _uof.WorkOrderRepository.Update(workOrder);
-            await _uof.CommitAsync();
-
-            var workOrderDto = new WorkOrderDTO
-            {
-                WorkOrderId = workOrder.WorkOrderId,
-                Description = workOrder.Description,
-                Title = workOrder.Title,
-                Amount = workOrder.Amount,
-                Deadline = workOrder.Deadline,
-                OpeningDate = workOrder.OpeningDate,
-                TechnicianId = workOrder.TechnicianId,
-                CustomerId = workOrder.CustomerId,
-                CategoryId = workOrder.CategoryId,
-                EquipmentId = workOrder.EquipmentId
+                WorkOrderId = id,
+                Description = dto.Description,
+                Title = dto.Title,
+                Amount = dto.Amount,
+                Deadline = dto.Deadline,
+                TechnicianId = dto.TechnicianId,
+                CustomerId = dto.CustomerId,
+                CategoryId = dto.CategoryId,
+                EquipmentId = dto.EquipmentId
             };
 
-            return Ok(workOrderDto);
-
-        }
-
-        [HttpPatch("{id:int:min(1)}/start")]
-        public async Task<ActionResult> Start(int id)
-        {
-            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
-
-            if (workOrder is null)
-            {
-                _logger.LogWarning($"WorkOrder with id= {id} not found...");
-                return NotFound("WorkOrder not found.");
-            }
-            workOrder.Start();
-
-            await _uof.CommitAsync();
+            var workOrder = await _mediator.Send(command);
 
             var workOrderDto = new WorkOrderDTO
             {
@@ -188,22 +152,37 @@ namespace OSTech.WebAPI.Controllers
             };
 
             return Ok(workOrderDto);
+        }
 
+        [HttpPatch("{id:int:min(1)}/start")]
+        public async Task<ActionResult> Start(int id)
+        {
+            var command = new StartWorkOrderCommand { WorkOrderId = id };
+
+            var workOrder = await _mediator.Send(command);
+
+            var workOrderDto = new WorkOrderDTO
+            {
+                WorkOrderId = workOrder.WorkOrderId,
+                Description = workOrder.Description,
+                Title = workOrder.Title,
+                Status = workOrder.Status,
+                Amount = workOrder.Amount,
+                Deadline = workOrder.Deadline,
+                OpeningDate = workOrder.OpeningDate,
+                TechnicianId = workOrder.TechnicianId,
+                CustomerId = workOrder.CustomerId,
+                CategoryId = workOrder.CategoryId,
+                EquipmentId = workOrder.EquipmentId
+            };
+
+            return Ok(workOrderDto);
         }
         [HttpPatch("{id:int:min(1)}/complete")]
         public async Task<ActionResult> Complete(int id)
         {
-            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
-
-            if (workOrder is null)
-            {
-                _logger.LogWarning($"WorkOrder with id= {id} not found...");
-                return NotFound("WorkOrder not found.");
-            }
-
-            workOrder.Complete();
-
-            await _uof.CommitAsync();
+            var command = new CompleteWorkOrderCommand { WorkOrderId = id };
+            var workOrder = await _mediator.Send(command);
 
             var workOrderDto = new WorkOrderDTO
             {
@@ -226,17 +205,9 @@ namespace OSTech.WebAPI.Controllers
         [HttpPatch("{id:int:min(1)}/cancel")]
         public async Task<ActionResult> Cancel(int id)
         {
-            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
+            var command = new CancelWorkOrderCommand { WorkOrderId = id };
 
-            if (workOrder is null)
-            {
-                _logger.LogWarning($"WorkOrder with id= {id} not found...");
-                return NotFound("WorkOrder not found.");
-            }
-
-            workOrder.Cancel();
-
-            await _uof.CommitAsync();
+            var workOrder = await _mediator.Send(command);
 
             var workOrderDto = new WorkOrderDTO
             {
@@ -254,7 +225,6 @@ namespace OSTech.WebAPI.Controllers
             };
 
             return Ok(workOrderDto);
-
         }
         [HttpDelete("{id:int:min(1)}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -262,20 +232,17 @@ namespace OSTech.WebAPI.Controllers
         [ProducesDefaultResponseType]
         public async Task<ActionResult> Delete(int id)
         {
-
-            var workOrder = await _uof.WorkOrderRepository.GetById(c => c.WorkOrderId == id);
-
-            if (workOrder is null)
+            try
+            {
+                var command = new DeleteWorkOrderCommand { WorkOrderId = id };
+                await _mediator.Send(command);
+                return NoContent();
+            }
+            catch (DomainException)
             {
                 _logger.LogWarning($"WorkOrder with id= {id} not found...");
                 return NotFound("WorkOrder not found.");
             }
-
-            await _uof.WorkOrderRepository.Delete(id);
-            await _uof.CommitAsync();
-
-            return NoContent();
-
         }
     }
 }
