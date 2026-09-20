@@ -19,14 +19,14 @@ namespace OSTech.Tests.UnitTests.WorkOder
 
         public GetWorkOrderUnitTests(WorkOrderUnitTestController controller)
         {
-            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper);
+            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper, controller.mediator);
         }
 
         [Fact]
         public async Task GetWorkOrderById_OkResult()
         {
             //Arrange
-            var id = 2;
+            var id = 3; // existe no seed e não é usado por nenhum teste de Delete
 
             //Act
             var data = await _controller.Get(id);
@@ -34,7 +34,6 @@ namespace OSTech.Tests.UnitTests.WorkOder
             //Assert (xunit)
             var okResult = Assert.IsType<OkObjectResult>(data.Result);
             Assert.Equal(200, okResult.StatusCode);
-
         }
 
         [Fact]

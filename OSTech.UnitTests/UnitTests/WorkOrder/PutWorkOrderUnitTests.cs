@@ -20,7 +20,7 @@ namespace OSTech.Tests.UnitTests.WorkOrder
 
         public PutWorkOrderUnitTests(WorkOrderUnitTestController controller)
         {
-            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper);
+            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper, controller.mediator);
         }
         [Fact]
         public async Task PutWorkOrder_Return_OkResult()

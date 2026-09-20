@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
+using OSTech.Domain.Exceptions;
 using OSTech.Tests.UnitTests.Technician;
 using OSTech.Tests.UnitTests.WorkOder;
 using OSTech.WebAPI.Controllers;
@@ -18,7 +19,7 @@ namespace OSTech.Tests.UnitTests.WorkOrder
 
         public DeleteWorkOrderUnitTests(WorkOrderUnitTestController controller)
         {
-            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper);
+            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper, controller.mediator);
         }
 
         [Fact]
@@ -37,12 +38,11 @@ namespace OSTech.Tests.UnitTests.WorkOrder
         [Fact]
         public async Task DeleteWorkOrderById_Return_NotFound()
         {
-            var id = 999;
+            var id = 9999;
 
             var result = await _controller.Delete(id);
 
-            result.Should().BeOfType<NotFoundObjectResult>()
-                  .Which.StatusCode.Should().Be(404);
+            result.Should().BeOfType<NotFoundObjectResult>();
         }
     }
 }
