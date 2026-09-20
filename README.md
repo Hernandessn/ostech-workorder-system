@@ -12,6 +12,15 @@
 
 ---
 
+# 🔗 Live Demo
+
+- **App:** https://ostech-system.netlify.app
+- **API (Swagger):** https://ostech-workorder-system.onrender.com/swagger
+
+> ⚠️ Both the API and the database run on free-tier infrastructure (Render + Aiven). The API may take 30–60 seconds to respond on the first request after a period of inactivity, as the free instance spins down when idle. Subsequent requests are fast.
+
+---
+
 # 📖 About
 
 OSTech is a long-term learning project created to simulate the evolution of a real-world service order management system.
@@ -703,6 +712,20 @@ Topics studied:
 
 ---
 
+## ✅ Stage 7 — CQRS + MediatR
+
+Completed.
+
+Topics studied:
+
+- Command Query Responsibility Segregation
+- MediatR (IRequest, IRequestHandler)
+- Read-model projections bypassing the rich domain model
+- Application-layer orchestration via Command Handlers
+- Conscious decision not to expand the pattern to every Aggregate
+
+---
+
 # 🧭 Domain-Driven Design
 
 After completing the initial architectural stages, the domain layer was revisited and evolved using Domain-Driven Design principles, applied selectively based on real needs identified in the domain — not as a checklist of patterns.
@@ -726,11 +749,24 @@ A full sprint-by-sprint report of this process is available on request / in proj
 
 The OSTech will continue evolving as new software engineering concepts are studied.
 
-Planned topics include:
+Planned topics will be added as new concepts are studied.
 
-- CQRS
+---
 
-These technologies will be introduced gradually rather than being treated as completed features.
+# 🧭 CQRS + MediatR
+
+Building on the domain model established during the DDD phase, the `WorkOrder` Aggregate's use cases (Create, Update, Delete, Start, Complete, Cancel, and the two read queries) were migrated to a CQRS approach using MediatR.
+
+Key outcomes:
+
+- **Commands** (`CreateWorkOrderCommand`, `UpdateWorkOrderCommand`, `StartWorkOrderCommand`, etc.) encapsulate write intent and are handled by dedicated Handlers that orchestrate the domain — the business rules themselves remain inside the `WorkOrder` entity, unchanged.
+- **Queries** (`GetWorkOrderByIdQuery`, `GetWorkOrdersQuery`) project directly from the database into DTOs via EF Core, bypassing the rich domain model entirely — read paths no longer pay the cost of materializing an Entity they won't mutate.
+- **Domain-specific exceptions** were refined further: a new `NotFoundDomainException` was introduced to distinguish "resource not found" (404) from other domain rule violations (400), applied consistently across every `WorkOrder` Handler.
+- The previously built `WorkOrderApplicationService` (see the DDD section) was fully absorbed into the CQRS Handlers rather than kept alongside them, avoiding duplicated orchestration logic.
+
+As with the DDD phase, the pattern was **not** applied to the remaining Aggregates (`Technician`, `Customer`, `Category`, `Equipment`) — the WorkOrder migration already demonstrated the pattern end to end, and expanding it further was judged to add repetition without new learning value at this stage.
+
+A full sprint-by-sprint report of this process is available on request / in project notes.
 
 ---
 
@@ -761,8 +797,6 @@ Instead of creating isolated projects for every technology, OSTech uses the same
 This makes it possible to observe how the architecture changes as new requirements and technologies are introduced.
 
 ---
-
-
 
 # ▶️ Getting Started
 
@@ -937,6 +971,8 @@ Throughout the development of OSTech, I have practiced:
 **React Frontend:** ✅ Completed
 
 **Domain-Driven Design:** ✅ Completed
+
+**CQRS + MediatR:** ✅ Completed
 
 **Current focus:** 🚧 Continuing the software engineering roadmap
 
