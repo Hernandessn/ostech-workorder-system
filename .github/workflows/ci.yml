@@ -10,6 +10,7 @@ on:
       - ci/first-workflow
   pull_request:
     branches:
+      - main
       - ci/first-workflow
   workflow_dispatch:
 
