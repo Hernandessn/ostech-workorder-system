@@ -1,0 +1,72 @@
+
+name: "OsTech in Github Actions"
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - ci/first-workflow
+  pull_request:
+    branches:
+      - ci/first-workflow
+  workflow_dispatch:
+
+env:
+  NODE_VERSION_NETLIFY: "24.21.0"
+
+jobs:
+  api:
+    name: "Restore, build e test da API"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout do código"
+        uses: actions/checkout@v4
+
+      - name: "Setup .NET"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: "Verificar SDK selecionado"
+        run: dotnet --version
+
+      - name: "Verificar SDK .NET"
+        run: dotnet --info
+
+      - name: "Restaurar dependências"
+        run: dotnet restore OSTech.slnx
+
+      - name: "Compilar solução"
+        run: dotnet build OSTech.slnx --no-restore
+
+      - name: "Executar testes com filtro"
+        run: dotnet test OSTech.slnx --no-build --no-restore --filter "FullyQualifiedName~UnitTests.Domain"
+
+  frontend:
+    name: "Build do frontend React"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ostechreact
+
+    env:
+      REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL_CI }}
+
+    steps:
+      - name: "Checkout do código"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION_NETLIFY }}
+
+      - name: "Instalar dependências"
+        run: npm ci
+
+      - name: "Compilar frontend"
+        run: npm run build
