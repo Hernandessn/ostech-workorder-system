@@ -1,8 +1,14 @@
 
 name: "OsTech in Github Actions"
 
+permissions:
+  contents: read
+
 on:
   push:
+    branches:
+      - ci/first-workflow
+  pull_request:
     branches:
       - ci/first-workflow
   workflow_dispatch:
@@ -24,6 +30,9 @@ jobs:
         with:
           dotnet-version: "9.0.x"
 
+      - name: "Verificar SDK .NET"
+        run: dotnet --info
+
       - name: "Restaurar dependências"
         run: dotnet restore OSTech.slnx
 
@@ -31,7 +40,7 @@ jobs:
         run: dotnet build OSTech.slnx --no-restore
 
       - name: "Executar testes com filtro"
-        run: dotnet test OSTech.slnx --no-build --no-restore --filter "FullyQualifiedName~WorkOrder"
+        run: dotnet test OSTech.slnx --no-build --no-restore --filter "FullyQualifiedName~UnitTests.Domain"
 
   frontend:
     name: "Build do frontend React"
@@ -58,4 +67,3 @@ jobs:
 
       - name: "Compilar frontend"
         run: npm run build
-
