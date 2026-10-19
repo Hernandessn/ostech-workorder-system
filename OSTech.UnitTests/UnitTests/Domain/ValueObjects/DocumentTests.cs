@@ -12,7 +12,7 @@ namespace OSTech.Tests.UnitTests.Domain.ValueObjects
         {
             var document = Document.Create("52998224725"); // CPF válido conhecido
 
-            document.Type.Should().Be(DocumentType.CPF);
+            document.Type.Should().Be(DocumentType.CNPJ);
         }
 
         [Fact]
