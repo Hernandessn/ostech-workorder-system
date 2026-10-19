@@ -97,3 +97,29 @@ jobs:
 
       - name: "Compilar frontend"
         run: npm run build
+
+  docker:
+    name: "Build das imagens do Docker"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout do código"
+        uses: actions/checkout@v4
+
+      - name: "Construir imagens da API"
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ostech-api:latest
+
+      - name: "Construir imagens do frotend"
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ostechreact
+          file: ./ostechreact/Dockerfile
+          push: false
+          tags: ostech-frontend:latest
+          build-args: |
+            REACT_APP_API_URL=${{ vars.REACT_APP_API_URL_CI }}
