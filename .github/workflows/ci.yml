@@ -21,6 +21,22 @@ jobs:
     name: "Restore, build e test da API"
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root_test
+          MYSQL_DATABASE: ostech_test
+          MYSQL_USER: ostech
+          MYSQL_PASSWORD: ostech_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -host=127.0.0.1 -uroot -proot_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: "Checkout do código"
         uses: actions/checkout@v4
@@ -42,6 +58,17 @@ jobs:
       - name: "Compilar solução"
         run: dotnet build OSTech.slnx --no-restore
 
+      - name: "Instalar ferramentas EF Core"
+        run: dotnet tool install --global dotnet-ef --version 9.0.0
+
+      - name: "Aplicar migrations no MySQL de teste"
+        env:
+          ConnectionStrings__DefaultConnection: "Server=127.0.0.1;Port=3306;Database=ostech_test;User=ostech;Password=ostech_test;"
+          JWT__SecretKey: "ci-only-test-key-not-for-production-123456789"
+        run: |
+          dotnet ef database update \
+            --project OSTech.EFCore/OSTech.Infrastructure.csproj \
+            --startup-project OSTech.WebAPI/OSTech.WebAPI.csproj
       - name: "Executar testes com filtro"
         run: dotnet test OSTech.slnx --no-build --no-restore --filter "FullyQualifiedName~UnitTests.Domain"
 
