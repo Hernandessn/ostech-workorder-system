@@ -4,3 +4,8 @@
 - `HttpsRedirection`: removido do pipeline em `Program.cs` porque a aplicação roda em container atrás de proxy reverso que termina TLS. Se rodar sem proxy no futuro, reavaliar.
 - Claims hardcoded em `Program.cs` (`RequireClaim("id", "Hernandes")` nas policies `SuperAdmin` e `ExclusivePolicyOnly`): valor fixo usado propositalmente como prática de estudo de `RequireClaim`/`RequireAssertion` do ASP.NET Core Identity. Não reflete prática de produção — se o projeto for usado como portfólio ou base real, trocar por critério não pessoal (role, claim de configuração, etc).
 - Publicação em registry (Docker Hub, GHCR, etc.): adiada propositalmente. O projeto ainda está em desenvolvimento ativo, gerando builds intermediários que não fazem sentido publicar. Retomar quando houver necessidade real de distribuição (deploy em servidor externo, compartilhamento com terceiros).
+- [ ] **Avaliar e corrigir a vulnerabilidade do AutoMapper**
+  - O AutoMapper `12.0.1` apresenta o aviso `NU1903`, referente a uma vulnerabilidade conhecida de alta severidade.
+  - Verificar uma versão corrigida compatível com o projeto .NET 9, considerando licença e requisitos de compatibilidade.
+  - Avaliar a atualização do pacote ou a migração para uma alternativa gratuita.
+  - Validar a restauração, compilação e testes automatizados após a correção.
