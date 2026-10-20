@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using AutoMapper;
+using OSTech.Application.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
@@ -19,12 +19,10 @@ namespace OSTech.WebAPI.Controllers
     {
         private readonly ILogger<EquipmentController> _logger;
         private readonly IUnitOfWork _uof;
-        private readonly IMapper _mapper;
-        public EquipmentController(ILogger<EquipmentController> logger, IUnitOfWork uof, IMapper mapper)
+        public EquipmentController(ILogger<EquipmentController> logger, IUnitOfWork uof)
         {
             _logger = logger;
             _uof = uof;
-            _mapper = mapper;
         }
         /// <summary>
         /// Obtém todos os equipamentos cadastrados 
@@ -39,7 +37,7 @@ namespace OSTech.WebAPI.Controllers
             try
             {
                 var equipments = await _uof.EquipmentRepository.GetAll();
-                var equipmentsDto = _mapper.Map<IEnumerable<EquipmentDTO>>(equipments);
+                var equipmentsDto = equipments.ToDto();
 
                 return Ok(equipmentsDto);
             }
@@ -65,7 +63,7 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Equipment not found.");
             }
 
-            var dto = _mapper.Map<EquipmentDTO>(equipment);
+            var dto = equipment.ToDto();
 
             return Ok(dto);
 

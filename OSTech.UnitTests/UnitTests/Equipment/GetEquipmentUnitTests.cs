@@ -20,7 +20,7 @@ namespace OSTech.Tests.UnitTests.Equipment
 
         public GetEquipmentUnitTests(EquipmentUnitTestController controller)
         {
-            _controller = new EquipmentController(NullLogger<EquipmentController>.Instance, controller.repository, controller.mapper);
+            _controller = new EquipmentController(NullLogger<EquipmentController>.Instance, controller.repository);
         }
         [Fact]
         public async Task GetEquipmentById_OkResult()

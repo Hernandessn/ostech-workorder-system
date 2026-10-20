@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using AutoMapper;
+using OSTech.Application.Mappings;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OSTech.Domain.Exceptions;
@@ -18,12 +18,10 @@ namespace OSTech.WebAPI.Controllers
         private readonly ILogger<WorkOrderController> _logger;
         private readonly IUnitOfWork _uof;
         private readonly IMediator _mediator;
-        private readonly IMapper _mapper;
-        public WorkOrderController(ILogger<WorkOrderController> logger, IUnitOfWork uof, IMapper mapper, IMediator mediator)
+        public WorkOrderController(ILogger<WorkOrderController> logger, IUnitOfWork uof, IMediator mediator)
         {
             _logger = logger;
             _uof = uof;
-            _mapper = mapper;
             _mediator = mediator;
         }
         /// <summary>

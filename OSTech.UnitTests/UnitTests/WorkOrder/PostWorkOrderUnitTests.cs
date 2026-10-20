@@ -17,7 +17,6 @@ namespace OSTech.Tests.UnitTests.WorkOder
             _controller = new WorkOrderController(
                 NullLogger<WorkOrderController>.Instance,
                 controller.repository,
-                controller.mapper,
                 controller.mediator); // precisa existir no fixture
         }
 

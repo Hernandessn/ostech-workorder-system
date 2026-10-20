@@ -27,7 +27,7 @@ namespace OSTech.Tests.UnitTests.Category
             _categoryDomainService = new CategoryDomainService(domainAdapter);
 
             _controller = new CategoryController(NullLogger<CategoryController>.Instance,
-                                                 controller.repository, controller.mapper, _memoryCache, _categoryDomainService);
+                                                 controller.repository, _memoryCache, _categoryDomainService);
         }
         [Fact]
         public async Task DeleteCategoryById_Return_NoContent()

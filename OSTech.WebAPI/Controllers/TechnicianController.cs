@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using AutoMapper;
+using OSTech.Application.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OSTech.Domain.Entities;
@@ -20,12 +20,10 @@ namespace OSTech.WebAPI.Controllers
     {
         private readonly ILogger<TechnicianController> _logger;
         private readonly IUnitOfWork _uof;
-        private readonly IMapper _mapper;
-        public TechnicianController(ILogger<TechnicianController> logger, IUnitOfWork uof, IMapper mapper)
+        public TechnicianController(ILogger<TechnicianController> logger, IUnitOfWork uof)
         {
             _logger = logger;
             _uof = uof;
-            _mapper = mapper;
         }
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<TechnicianDTO>>> GetFilter([FromQuery]
@@ -33,7 +31,7 @@ namespace OSTech.WebAPI.Controllers
         {
             var technicians = await _uof.TechnicianRepository.Filter(parameters);
 
-            var techniciansDto = _mapper.Map<IEnumerable<TechnicianDTO>>(technicians);
+            var techniciansDto = technicians.ToDto();
 
             return Ok(techniciansDto);
         }
@@ -54,7 +52,7 @@ namespace OSTech.WebAPI.Controllers
 
             Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
 
-            var techniciansDto = _mapper.Map<IEnumerable<TechnicianDTO>>(technicians);
+            var techniciansDto = technicians.ToDto();
 
             return Ok(techniciansDto);
         }
@@ -72,7 +70,7 @@ namespace OSTech.WebAPI.Controllers
             {
                 var technicians = await _uof.TechnicianRepository.GetAll();
 
-                var techniciansDto = _mapper.Map<IEnumerable<TechnicianDTO>>(technicians);
+                var techniciansDto = technicians.ToDto();
 
                 return Ok(techniciansDto);
             }
@@ -98,7 +96,7 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Technician not found.");
             }
 
-            var dto =_mapper.Map<TechnicianDTO>(technician);
+            var dto =technician.ToDto();
 
             return Ok(dto);
         }

@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using AutoMapper;
+using OSTech.Application.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OSTech.Domain.Entities;
@@ -21,12 +21,10 @@ namespace OSTech.WebAPI.Controllers
     {
         private readonly ILogger<CustomerController> _logger;
         private readonly IUnitOfWork _uof;
-        private readonly IMapper _mapper;
-        public CustomerController(ILogger<CustomerController> logger, IUnitOfWork uof, IMapper mapper)
+        public CustomerController(ILogger<CustomerController> logger, IUnitOfWork uof)
         {
             _logger = logger;
             _uof = uof;
-            _mapper = mapper;
         }
         /// <summary>
         /// Obtém todos os clientes cadastrados
@@ -42,7 +40,7 @@ namespace OSTech.WebAPI.Controllers
             {
                 var customers = await _uof.CustomerRepository.GetAll();
 
-                var customersDto = _mapper.Map<IEnumerable<CustomerDTO>>(customers);
+                var customersDto = customers.ToDto();
 
                 return Ok(customersDto);
 
@@ -69,7 +67,7 @@ namespace OSTech.WebAPI.Controllers
                 return NotFound("Customer not found.");
             }
 
-            var dto = _mapper.Map<CustomerDTO>(customer);
+            var dto = customer.ToDto();
 
             return Ok(dto);
         }

@@ -16,7 +16,7 @@ namespace OSTech.Tests.UnitTests.Technician
         private readonly TechnicianController _controller;
         public DeleteTechnicianUnitTests(TechnicianUnitTestController controller)
         {
-            _controller = new TechnicianController(NullLogger<TechnicianController>.Instance, controller.repository, controller.mapper);
+            _controller = new TechnicianController(NullLogger<TechnicianController>.Instance, controller.repository);
         }
 
         [Fact]
