@@ -2,7 +2,8 @@
 
 > A Service Order Management System built to study modern .NET, Web API and React development.
 
-![.NET](https://img.shields.io/badge/.NET-10-purple)
+[![CI/CD](https://github.com/Hernandessn/ostech-workorder-system/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Hernandessn/ostech-workorder-system/actions/workflows/ci.yml)
+![.NET](https://img.shields.io/badge/.NET-9-purple)
 ![C%23](https://img.shields.io/badge/C%23-Language-blue)
 ![Entity%20Framework%20Core](https://img.shields.io/badge/EF%20Core-9-green)
 ![ASP.NET%20Core](https://img.shields.io/badge/ASP.NET%20Core-Web%20API-blue)
@@ -15,7 +16,7 @@
 # 🔗 Live Demo
 
 - **App:** https://ostech-system.netlify.app
-- **API (Swagger):** https://ostech-workorder-system.onrender.com/swagger
+- **API health check:** https://ostech-workorder-system.onrender.com/health
 
 > ⚠️ Both the API and the database run on free-tier infrastructure (Render + Aiven). The API may take 30–60 seconds to respond on the first request after a period of inactivity, as the free instance spins down when idle. Subsequent requests are fast.
 
@@ -83,20 +84,14 @@ The project currently contains different applications consuming the same backend
 
 ```text
 OSTech
-│
 ├── OSTech.Domain
-│
-├── OSTech.EFCore
-│
-├── OSTech.Infrastructure
-│
+├── OSTech.Application
+├── OSTech.EFCore            (project name: OSTech.Infrastructure)
 ├── OSTech.WebAPI
-│
 ├── OSTech.WebMVC
-│
 ├── OSTech.Console
-│
-└── OSTech.React
+├── OSTech.UnitTests         (project name: OSTech.Tests)
+└── ostechreact
 ```
 
 ---
@@ -533,7 +528,7 @@ The React application includes a dashboard displaying operational information su
 ## Backend
 
 - C#
-- .NET 10
+- .NET 9
 - ASP.NET Core
 - Entity Framework Core
 - LINQ
@@ -576,20 +571,14 @@ The React application includes a dashboard displaying operational information su
 
 ```text
 OSTech
-│
-├── OSTech.Console
-│
 ├── OSTech.Domain
-│
-├── OSTech.EFCore
-│
-├── OSTech.Infrastructure
-│
+├── OSTech.Application
+├── OSTech.EFCore            (project name: OSTech.Infrastructure)
 ├── OSTech.WebAPI
-│
 ├── OSTech.WebMVC
-│
-└── OSTech.React
+├── OSTech.Console
+├── OSTech.UnitTests         (project name: OSTech.Tests)
+└── ostechreact
 ```
 
 ---
@@ -726,6 +715,20 @@ Topics studied:
 
 ---
 
+## ✅ Stage 8 — Docker
+
+Completed.
+
+Topics studied: multi-stage builds, Docker Compose, named volumes, healthchecks, isolated networks, image size optimization (Alpine), versioned tags, production override.
+
+---
+
+## 🚧 Stage 9 — CI/CD with GitHub Actions
+
+In progress: CI and Docker image builds are working, deploys are manual, and documentation is being finalized.
+
+---
+
 # 🧭 Domain-Driven Design
 
 After completing the initial architectural stages, the domain layer was revisited and evolved using Domain-Driven Design principles, applied selectively based on real needs identified in the domain — not as a checklist of patterns.
@@ -747,9 +750,10 @@ A full sprint-by-sprint report of this process is available on request / in proj
 
 # 🚧 Next Steps
 
-The OSTech will continue evolving as new software engineering concepts are studied.
-
-Planned topics will be added as new concepts are studied.
+- Validate Render rollback and Aiven restore
+- Deterministic database for controller tests
+- Registry publishing (postponed, see `TODO.md`)
+- Automate migrations safely
 
 ---
 
@@ -799,6 +803,18 @@ This makes it possible to observe how the architecture changes as new requiremen
 ---
 
 # ▶️ Getting Started
+
+## Prerequisites
+
+- .NET SDK **9.0.x** (the repository pins `9.0.319` in `global.json`)
+- Node.js and npm
+- MySQL 8
+
+Configure the connection string with User Secrets (single quotes avoid shell interpolation of `$` in passwords):
+
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" 'Server=localhost;Database=OSTechDatabase;User=root;Password=<your-password>' --project OSTech.WebAPI
+```
 
 ## Backend
 
@@ -868,7 +884,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/Hernandessn/ostech-workorder-system.git
-cd OSTech
+cd ostech-workorder-system
 ```
 
 Create a `.env` file in the project root with the following variables:
@@ -890,6 +906,8 @@ This will build and start three services:
 - **mysql** — MySQL 8.0 database (exposed on port 3306)
 - **api** — ASP.NET Core Web API (exposed on port 8000)
 - **frontend** — React app served via Nginx (exposed on port 3000)
+
+The `api` service waits for the MySQL healthcheck (`depends_on: condition: service_healthy`). `mysql` and `api` share a dedicated network, and `frontend` is kept outside it. Images are tagged `1.0.0` and the API image uses an Alpine base.
 
 ## Applying migrations
 
@@ -916,6 +934,52 @@ By default, `docker-compose up` runs the API in `Development` mode (Swagger enab
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 ```
+
+---
+
+# 🔄 CI/CD and Deployment
+
+## Pipeline
+
+Workflow: `.github/workflows/ci.yml`. It runs on pushes to `master`, on pull requests targeting `master`, and manually (`workflow_dispatch`). Permissions are limited to `contents: read`. It has no deploy step and never touches production credentials.
+
+| Job | What it does |
+|---|---|
+| `api` | Restores, builds the solution and runs the domain unit tests (`FullyQualifiedName~UnitTests.Domain`, 25 tests) |
+| `frontend` | `npm ci` and `npm run build` with `CI=true` |
+| `docker` | Builds the API and frontend images without pushing them |
+
+### What CI does not cover
+
+- Controller tests that depend on a database, unless `ci.yml` runs them.
+- Database migrations on the production database.
+- Publishing images to a registry.
+
+## Deployment
+
+| Component | Host | Publishing |
+|---|---|---|
+| Frontend | Netlify | Manual |
+| API | Render (Docker) | Manual, auto-deploy disabled |
+| Database | Aiven MySQL (free tier) | Migrations applied manually |
+
+A change reaches production like this: pull request to `master` → CI checks pass → merge → manual deploy on Render and Netlify → check `GET /health` and the main frontend flows.
+
+The API exposes `GET /health`, which returns `{"status":"Healthy"}`.
+
+## Production configuration (names only)
+
+- API (Render): `ASPNETCORE_ENVIRONMENT`, `ConnectionStrings__DefaultConnection`, `Cors__AllowedOrigins__0`, `JWT__*`, `MyRateLimit__*`, `AllowedHosts`.
+- `ConnectionStrings__DefaultConnection` must use the `key=value;` format (`Server=...;Port=...;Database=...;User=...;Password=...;SslMode=Required;`). A URI such as `mysql://...` is not supported.
+- Frontend (Netlify): `REACT_APP_API_URL`, embedded at build time. It is visible in the browser, so never put secrets in it.
+
+## Known limitations
+
+- Render rollback and Aiven restore have not been exercised end to end.
+- Migrations are applied manually.
+- The free-tier API may take 30–60 seconds to wake up.
+
+---
 
 # 📖 What I've Learned
 
@@ -973,6 +1037,10 @@ Throughout the development of OSTech, I have practiced:
 **Domain-Driven Design:** ✅ Completed
 
 **CQRS + MediatR:** ✅ Completed
+
+**Docker:** ✅ Completed
+
+**CI/CD:** 🚧 In progress
 
 **Current focus:** 🚧 Continuing the software engineering roadmap
 
