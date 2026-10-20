@@ -176,7 +176,7 @@ Essa separação permite validar as alterações antes de decidir quando publica
 
 Antes de concluir a entrega:
 
-- [ ] Verificar se há senhas, tokens, chaves privadas ou credenciais reais versionadas.
+- [x] Verificar se há senhas, tokens, chaves privadas ou credenciais reais versionadas nos arquivos examinados; nenhuma credencial real de produção foi identificada.
 - [ ] Confirmar que os valores do MySQL e a chave JWT da CI são exclusivos de teste.
 - [ ] Confirmar que a URL da API está configurada adequadamente nas variáveis do GitHub Actions.
 - [ ] Conferir se as permissões do workflow permanecem mínimas.
