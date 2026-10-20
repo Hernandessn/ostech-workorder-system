@@ -754,6 +754,7 @@ A full sprint-by-sprint report of this process is available on request / in proj
 - Deterministic database for controller tests
 - Registry publishing (postponed, see `TODO.md`)
 - Automate migrations safely
+- Fix or replace AutoMapper 12.0.1 (`NU1903`)
 
 ---
 
@@ -854,6 +855,14 @@ Navigate to the React project:
 cd ostechreact
 ```
 
+Create your local environment file from the example (`.env` is not versioned):
+
+```bash
+cp .env.example .env
+```
+
+Then set `REACT_APP_API_URL` to the URL of your local API.
+
 Install dependencies:
 
 ```bash
@@ -945,13 +954,18 @@ Workflow: `.github/workflows/ci.yml`. It runs on pushes to `master`, on pull req
 
 | Job | What it does |
 |---|---|
-| `api` | Restores, builds the solution and runs the domain unit tests (`FullyQualifiedName~UnitTests.Domain`, 25 tests) |
-| `frontend` | `npm ci` and `npm run build` with `CI=true` |
-| `docker` | Builds the API and frontend images without pushing them |
+| `api` | Restores, builds the solution, starts a temporary MySQL 8.4 service, applies migrations to that test database and runs the domain unit tests (`FullyQualifiedName~UnitTests.Domain`, 25 tests) |
+| `frontend` | Node 24.21.0, `npm ci` and `npm run build`, with `REACT_APP_API_URL` taken from the `REACT_APP_API_URL_CI` Actions variable |
+| `docker` | Builds the API and frontend images without pushing them (`push: false`) |
+
+The `master` branch is protected: merges are blocked when the required checks fail.
+
+Full details: [`docs/ci-cd.md`](docs/ci-cd.md).
 
 ### What CI does not cover
 
-- Controller tests that depend on a database, unless `ci.yml` runs them.
+- Controller tests that depend on a database (excluded by the test filter).
+- Full UI tests for the frontend.
 - Database migrations on the production database.
 - Publishing images to a registry.
 
@@ -975,9 +989,12 @@ The API exposes `GET /health`, which returns `{"status":"Healthy"}`.
 
 ## Known limitations
 
-- Render rollback and Aiven restore have not been exercised end to end.
+- Render rollback: the option was located in the dashboard but never executed.
+- Aiven: backups with point-in-time recovery are available, but a restore has never been tested. `Fork service` is not available on the current plan.
+- `/health` only confirms that the application responds; it does not check the database.
 - Migrations are applied manually.
 - The free-tier API may take 30–60 seconds to wake up.
+- AutoMapper 12.0.1 triggers the `NU1903` security warning (tracked in `TODO.md`).
 
 ---
 
