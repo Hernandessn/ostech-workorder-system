@@ -20,7 +20,7 @@ namespace OSTech.Tests.UnitTests.Technician
 
         public PostTechnicianUnitTests(TechnicianUnitTestController controller)
         {
-            _controller = new TechnicianController(NullLogger<TechnicianController>.Instance, controller.repository, controller.mapper);
+            _controller = new TechnicianController(NullLogger<TechnicianController>.Instance, controller.repository);
 
         }
         [Fact]

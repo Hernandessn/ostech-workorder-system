@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OSTech.Application.Mappings;
 using OSTech.Domain;
 using OSTech.Domain.Entities;
 using OSTech.Domain.Services;
@@ -172,8 +171,6 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-
-builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IDomainWorkOrderRepository, WorkOrderRepository>();
 builder.Services.AddScoped<CategoryDomainService>();

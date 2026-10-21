@@ -19,7 +19,7 @@ namespace OSTech.Tests.UnitTests.WorkOrder
 
         public DeleteWorkOrderUnitTests(WorkOrderUnitTestController controller)
         {
-            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mapper, controller.mediator);
+            _controller = new WorkOrderController(NullLogger<WorkOrderController>.Instance, controller.repository, controller.mediator);
         }
 
         [Fact]

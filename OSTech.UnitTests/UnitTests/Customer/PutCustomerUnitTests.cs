@@ -19,7 +19,7 @@ namespace OSTech.Tests.UnitTests.Customer
 
         public PutCustomerUnitTests(CustomerUnitTestController controller)
         {
-            _controller = new CustomerController(NullLogger<CustomerController>.Instance, controller.repository, controller.mapper);
+            _controller = new CustomerController(NullLogger<CustomerController>.Instance, controller.repository);
         }
         [Fact]
         public async Task PutCustomer_Return_OkResult()

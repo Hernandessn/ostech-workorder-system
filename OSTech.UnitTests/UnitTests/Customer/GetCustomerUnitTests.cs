@@ -17,7 +17,7 @@ namespace OSTech.Tests.UnitTests.Customer
 
         public GetCustomerUnitTests(CustomerUnitTestController controller)
         {
-            _controller = new CustomerController(NullLogger<CustomerController>.Instance, controller.repository, controller.mapper);
+            _controller = new CustomerController(NullLogger<CustomerController>.Instance, controller.repository);
         }
 
         [Fact]

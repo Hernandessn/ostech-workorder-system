@@ -20,7 +20,7 @@ namespace OSTech.Tests.UnitTests.Technician
 
         public PutTechnicianUnitTests(TechnicianUnitTestController controller)
         {
-            _controller = new TechnicianController(NullLogger<TechnicianController>.Instance, controller.repository, controller.mapper);
+            _controller = new TechnicianController(NullLogger<TechnicianController>.Instance, controller.repository);
         }
         [Fact]
         public async Task PutTechnician_Return_OkResult()

@@ -24,7 +24,7 @@ namespace OSTech.Tests.UnitTests.Category
             _memoryCache = new MemoryCache(new MemoryCacheOptions());
 
             _controller = new CategoryController(NullLogger<CategoryController>.Instance, 
-                controller.repository, controller.mapper, _memoryCache, _categoryDomainService);
+                controller.repository, _memoryCache, _categoryDomainService);
         }
 
         [Fact]

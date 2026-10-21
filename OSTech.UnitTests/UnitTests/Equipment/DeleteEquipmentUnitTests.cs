@@ -12,7 +12,7 @@ namespace OSTech.Tests.UnitTests.Equipment
 
         public DeleteEquipmentUnitTests(EquipmentUnitTestController controller)
         {
-            _controller = new EquipmentController(NullLogger<EquipmentController>.Instance, controller.repository, controller.mapper);
+            _controller = new EquipmentController(NullLogger<EquipmentController>.Instance, controller.repository);
         }
 
         [Fact]

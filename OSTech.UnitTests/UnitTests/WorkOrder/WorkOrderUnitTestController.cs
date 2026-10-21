@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
-using OSTech.Application.Mappings;
 using OSTech.EFCore.Context;
 using OSTech.Infrastructure.UnitOfWork;
 using OSTech.WebAPI.Commands.WorkOrders;
@@ -12,7 +10,6 @@ namespace OSTech.Tests.UnitTests.WorkOder
     public class WorkOrderUnitTestController
     {
         public IUnitOfWork repository;
-        public IMapper mapper;
         public IMediator mediator;
         private static DbContextOptions<AppDbContext> dbContextOptions;
 
@@ -25,13 +22,6 @@ namespace OSTech.Tests.UnitTests.WorkOder
         }
         public WorkOrderUnitTestController()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new MappingProfile());
-            });
-
-            mapper = config.CreateMapper();
-
             var context = new AppDbContext(dbContextOptions);
 
             repository = new UnitOfWork(context);
@@ -40,7 +30,6 @@ namespace OSTech.Tests.UnitTests.WorkOder
 
             services.AddSingleton(repository);
             services.AddSingleton(context);       
-            services.AddSingleton(mapper);
 
             services.AddLogging();
 

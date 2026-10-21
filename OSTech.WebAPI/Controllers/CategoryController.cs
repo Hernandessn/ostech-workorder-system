@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using AutoMapper;
+using OSTech.Application.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,15 +25,13 @@ namespace OSTech.WebAPI.Controllers
         private readonly CategoryDomainService _categoryDomainService;
         private readonly ILogger<CategoryController> _logger;
         private readonly IUnitOfWork _uof;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private const string CacheCategoriesKey = "CacheCategories";
         public CategoryController(ILogger<CategoryController> logger, IUnitOfWork uof,
-            IMapper mapper, IMemoryCache cache, CategoryDomainService categoryDomainService)
+            IMemoryCache cache, CategoryDomainService categoryDomainService)
         {
             _logger = logger;
             _uof = uof;
-            _mapper = mapper;
             _cache = cache;
             _categoryDomainService = categoryDomainService;
         }
@@ -62,7 +60,7 @@ namespace OSTech.WebAPI.Controllers
                     SetCache(CacheCategoriesKey, categories);
                 }
 
-                var categoritesDto = _mapper.Map<IEnumerable<CategoryDTO>>(categories);
+                var categoritesDto = categories.ToDto();
 
                 return Ok(categoritesDto);
             }
@@ -93,7 +91,7 @@ namespace OSTech.WebAPI.Controllers
                 SetCache(cacheKey, category);
             }
 
-            var dto = _mapper.Map<CategoryDTO>(category);
+            var dto = category.ToDto();
 
             return Ok(dto);
         }
